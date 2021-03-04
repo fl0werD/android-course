@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">fl0wer</string>
+
+    <!-- Contacts. -->
+    <string name="contacts_list">Список контактов</string>
+    <string name="contact_details">Детали контакта</string>
+    <string name="phone_main">Основной</string>
+    <string name="phone_mobile">Мобильный</string>
+    <string name="email_main">E-mail</string>
+    <string name="email_secondary">Доп. E-mail</string>
+    <string name="notes">Заметки</string>
 </resources>
