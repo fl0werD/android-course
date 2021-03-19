@@ -10,7 +10,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Fl0wer">
 
-        <activity android:name="com.example.fl0wer.MainActivity">
+        <activity android:name="com.example.fl0wer.MainActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -18,5 +19,13 @@
         </activity>
 
         <service android:name="com.example.fl0wer.ContactService" />
+
+        <receiver android:name="com.example.fl0wer.ContactBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.example.fl0wer.intent.action.CONTACT_BIRTHDAY" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

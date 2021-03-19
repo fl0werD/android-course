@@ -9,4 +9,7 @@
     <string name="email_main">E-mail</string>
     <string name="email_secondary">Доп. E-mail</string>
     <string name="notes">Заметки</string>
+    <string name="birthday">День рождения</string>
+    <string name="notice_birthday_name">Напоминание о дне рождения</string>
+    <string name="birthday_notice">Сегодня празднует день рождения %s</string>
 </resources>

@@ -127,6 +127,35 @@
                     tools:text="Email 2" />
 
                 <TextView
+                    android:id="@+id/birthday_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/birthday"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/birthday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                        android:textSize="18sp"
+                        tools:text="Число месяц" />
+
+                    <ImageView
+                        android:id="@+id/birthday_notice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/birthday"
+                        tools:srcCompat="@drawable/ic_notifications_none"
+                        tools:ignore="contentDescription"/>
+                </RelativeLayout>
+
+                <TextView
                     android:id="@+id/notes_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -137,6 +166,7 @@
                     android:id="@+id/notes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                     android:textSize="18sp"
                     android:textStyle="italic"

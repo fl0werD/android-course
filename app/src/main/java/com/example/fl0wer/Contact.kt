@@ -12,4 +12,5 @@ data class Contact(
     val email: String,
     val email2: String,
     val notes: String,
+    val birthdayTimestamp: Long,
 )
