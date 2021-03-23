@@ -23,6 +23,7 @@ class ContactListFragment : Fragment(
     }
 
     private lateinit var contactService: IContactServiceListener
+    private lateinit var contactClickListener: ContactClickListener
 
     private lateinit var loadingBar: ProgressBar
     private lateinit var contactCard: CardView
@@ -46,6 +47,11 @@ class ContactListFragment : Fragment(
             contactService = context
         } else {
             throw IllegalStateException("Context is not implement contact service interface")
+        }
+        if (context is ContactClickListener) {
+            contactClickListener = context
+        } else {
+            throw IllegalStateException("Context is not implement contact click listener")
         }
     }
 
@@ -119,11 +125,6 @@ class ContactListFragment : Fragment(
     }
 
     private fun contactClicked(id: Int) {
-        val fm = fragmentManager ?: return
-        val contactDetailsFragment = ContactDetailsFragment.newInstance(id)
-        fm.beginTransaction()
-            .replace(R.id.fragments_container, contactDetailsFragment)
-            .addToBackStack(null)
-            .commit()
+        contactClickListener.openContact(id)
     }
 }
