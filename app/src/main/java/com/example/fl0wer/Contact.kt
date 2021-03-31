@@ -3,7 +3,8 @@ package com.example.fl0wer
 import androidx.annotation.DrawableRes
 
 data class Contact(
-    val id: Int,
+    val rowId: Int,
+    val lookupKey: String,
     @DrawableRes
     val photo: Int,
     val name: String,

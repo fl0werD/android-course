@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">fl0wer</string>
 
+    <!-- Permission. -->
+    <string name="permission_text">Пожалуйста, выдайте разрешение на чтение списка контактов для правильной работы приложения.</string>
+    <string name="request_permission">Запросить разрешение</string>
+
     <!-- Contacts. -->
     <string name="contacts_list">Список контактов</string>
     <string name="contact_details">Детали контакта</string>

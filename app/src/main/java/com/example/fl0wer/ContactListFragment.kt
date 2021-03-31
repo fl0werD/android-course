@@ -115,7 +115,7 @@ class ContactListFragment : Fragment(
                 contactName.text = contact.name
                 contactPhone.text = contact.phone
                 setOnClickListener {
-                    contactClicked(contact.id)
+                    contactClicked(contact.lookupKey)
                 }
             } else {
                 isVisible = false
@@ -124,7 +124,7 @@ class ContactListFragment : Fragment(
         }
     }
 
-    private fun contactClicked(id: Int) {
+    private fun contactClicked(id: String) {
         contactClickListener.openContact(id)
     }
 }
