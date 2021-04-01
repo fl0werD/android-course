@@ -8,6 +8,4 @@ object Const {
 
     const val NOTICE_BIRTHDAY_EXTRA_CONTACT_ID = "EXTRA_CONTACT_ID"
     const val NOTICE_BIRTHDAY_EXTRA_TEXT = "EXTRA_TEXT"
-
-    const val UNDEFINED_CONTACT_ID = -1
 }

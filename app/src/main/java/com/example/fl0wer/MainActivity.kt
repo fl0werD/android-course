@@ -1,20 +1,23 @@
 package com.example.fl0wer
 
+import android.Manifest
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.commit
 import com.example.fl0wer.Const.NOTICE_BIRTHDAY_EXTRA_CONTACT_ID
-import com.example.fl0wer.Const.UNDEFINED_CONTACT_ID
 
 fun interface ConnectionListener {
     fun onServiceConnected()
 }
 
 fun interface ContactClickListener {
-    fun openContact(contactId: Int)
+    fun openContact(contactId: String)
 }
 
 class MainActivity : AppCompatActivity(R.layout.activity_main),
@@ -36,20 +39,26 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
             boundService = false
         }
     }
+    private val readContactsPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            bindContactService()
+            startNavigation()
+        } else {
+            showPermissionRationaleDialog()
+        }
+    }
     var contactService: IContactService? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        bindContactService()
-        if (savedInstanceState == null) {
-            openContactList()
-            intent.checkNavigation()
-        }
+        readContactsPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        intent.checkNavigation()
+        handleIntent(intent)
     }
 
     override fun onDestroy() {
@@ -57,11 +66,27 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         super.onDestroy()
     }
 
+    private fun startNavigation() {
+        openContactList()
+        handleIntent(intent)
+    }
+
     private fun openContactList() {
         val contactListFragment = ContactListFragment.newInstance()
-        supportFragmentManager.beginTransaction()
-            .add(R.id.fragments_container, contactListFragment)
-            .commit()
+        supportFragmentManager.commit {
+            replace(R.id.fragments_container, contactListFragment)
+        }
+    }
+
+    private fun showPermissionRationaleDialog() {
+        AlertDialog.Builder(this)
+            .setMessage(getString(R.string.permission_text))
+            .setPositiveButton(getString(R.string.request_permission)) { _, _ ->
+                readContactsPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
+            }
+            .setCancelable(false)
+            .create()
+            .show()
     }
 
     private fun bindContactService() {
@@ -78,11 +103,9 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         }
     }
 
-    private fun Intent.checkNavigation() {
-        val contactId = getIntExtra(NOTICE_BIRTHDAY_EXTRA_CONTACT_ID, UNDEFINED_CONTACT_ID)
-        if (contactId != UNDEFINED_CONTACT_ID) {
-            openContact(contactId)
-        }
+    private fun handleIntent(intent: Intent) {
+        val contactId = intent.getStringExtra(NOTICE_BIRTHDAY_EXTRA_CONTACT_ID) ?: return
+        openContact(contactId)
     }
 
     override fun contactService(): IContactService? {
@@ -97,11 +120,11 @@ class MainActivity : AppCompatActivity(R.layout.activity_main),
         contactServiceListeners.remove(listener)
     }
 
-    override fun openContact(contactId: Int) {
+    override fun openContact(contactId: String) {
         val contactDetailsFragment = ContactDetailsFragment.newInstance(contactId)
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragments_container, contactDetailsFragment)
-            .addToBackStack(null)
-            .commit()
+        supportFragmentManager.commit {
+            replace(R.id.fragments_container, contactDetailsFragment)
+            addToBackStack(null)
+        }
     }
 }

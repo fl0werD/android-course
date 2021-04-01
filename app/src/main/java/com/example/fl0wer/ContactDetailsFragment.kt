@@ -24,7 +24,6 @@ import androidx.fragment.app.Fragment
 import com.example.fl0wer.Const.NOTICE_BIRTHDAY_EXTRA_CONTACT_ID
 import com.example.fl0wer.Const.NOTICE_BIRTHDAY_EXTRA_TEXT
 import com.example.fl0wer.Const.RECEIVER_INTENT_ACTION_CONTACT_BIRTHDAY
-import com.example.fl0wer.Const.UNDEFINED_CONTACT_ID
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -64,7 +63,7 @@ class ContactDetailsFragment : Fragment(
         private const val BIRTHDAY_DATE_FORMAT = "dd.MM.yyyy"
 
         fun newInstance(
-            contactId: Int,
+            contactId: String,
         ): ContactDetailsFragment = ContactDetailsFragment().apply {
             arguments = bundleOf(
                 ARGUMENT_CONTACT_ID to contactId,
@@ -115,9 +114,9 @@ class ContactDetailsFragment : Fragment(
     }
 
     private fun fetchContact() {
-        val contactId = requireArguments().getInt(ARGUMENT_CONTACT_ID, UNDEFINED_CONTACT_ID)
+        val contactId = requireArguments().getString(ARGUMENT_CONTACT_ID)
 
-        require(contactId != UNDEFINED_CONTACT_ID) {
+        requireNotNull(contactId) {
             "Contact id argument required"
         }
 
@@ -164,12 +163,14 @@ class ContactDetailsFragment : Fragment(
         contactEmail.text = contact.email
         contactEmail2.text = contact.email2
         contactNotes.text = contact.notes
-        contactBirthday.text =
-            SimpleDateFormat(
-                BIRTHDAY_DATE_FORMAT,
-                Locale.getDefault()
-            ).format(Date(contact.birthdayTimestamp))
-        setBirthdayNoticeEnabled(getBirthdayNotice(contact.id) != null)
+        if (contact.birthdayTimestamp != 0L) {
+            contactBirthday.text =
+                SimpleDateFormat(
+                    BIRTHDAY_DATE_FORMAT,
+                    Locale.getDefault()
+                ).format(Date(contact.birthdayTimestamp))
+            setBirthdayNoticeEnabled(getBirthdayNotice(contact.rowId) != null)
+        }
     }
 
     private fun changeBirthdayNotice() {
@@ -177,19 +178,19 @@ class ContactDetailsFragment : Fragment(
         val alarmManager =
             requireContext().getSystemService(ALARM_SERVICE) as AlarmManager? ?: return
 
-        val birthdayNoticeIntent = getBirthdayNotice(contact.id)
+        val birthdayNoticeIntent = getBirthdayNotice(contact.rowId)
         if (birthdayNoticeIntent != null) {
             alarmManager.cancel(birthdayNoticeIntent)
             birthdayNoticeIntent.cancel()
             setBirthdayNoticeEnabled(false)
         } else {
             val pendingIntent = Intent(RECEIVER_INTENT_ACTION_CONTACT_BIRTHDAY).let {
-                it.putExtra(NOTICE_BIRTHDAY_EXTRA_CONTACT_ID, contact.id)
+                it.putExtra(NOTICE_BIRTHDAY_EXTRA_CONTACT_ID, contact.lookupKey)
                 it.putExtra(
                     NOTICE_BIRTHDAY_EXTRA_TEXT,
                     getString(R.string.birthday_notice, contact.name)
                 )
-                PendingIntent.getBroadcast(context, contact.id, it, FLAG_UPDATE_CURRENT)
+                PendingIntent.getBroadcast(context, contact.rowId, it, FLAG_UPDATE_CURRENT)
             }
             val nextBirthday = GregorianCalendar().apply {
                 val currentDate = GregorianCalendar()
