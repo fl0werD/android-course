@@ -29,13 +29,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:visibility="gone" />
+            tools:visibility="gone" />
 
         <ScrollView
-            android:id="@+id/details_layout"
+            android:id="@+id/scroll_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fillViewport="true">
+            android:fillViewport="true"
+            android:visibility="gone"
+            tools:visibility="visible" >
 
             <LinearLayout
                 android:layout_width="match_parent"

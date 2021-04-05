@@ -1,36 +1,33 @@
-package com.example.fl0wer
+package com.example.fl0wer.repository
 
-import android.app.Service
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
-import android.os.Binder
-import android.os.IBinder
 import android.provider.ContactsContract
-import java.lang.ref.WeakReference
-import java.util.concurrent.Executors
+import com.example.fl0wer.Const
+import com.example.fl0wer.Contact
+import com.example.fl0wer.R
+import com.example.fl0wer.dispatchers.DispatchersProvider
+import com.example.fl0wer.setTimer
+import kotlinx.coroutines.withContext
+import java.util.*
 
-class ContactService : Service() {
-    private val binder: IBinder = ContactBinder()
-    private val threadExecutor = Executors.newSingleThreadExecutor()
-
-    override fun onBind(intent: Intent): IBinder {
-        return binder
-    }
-
-    override fun onDestroy() {
-        threadExecutor.shutdown()
-        super.onDestroy()
-    }
-
-    private fun handleContact(data: Cursor) {
+class ContactsRepositoryImpl(
+    private val context: Context,
+    private val dispatchersProvider: DispatchersProvider,
+) : ContactsRepository {
+    private fun handleContact(data: Cursor): Contact? {
         data.use {
             while (data.moveToNext()) {
                 val rowId = it.getInt(it.getColumnIndex(ContactsContract.Contacts._ID))
                 val lookupKey = it.getString(it.getColumnIndex(ContactsContract.Data.LOOKUP_KEY))
-                val name = it.getString(it.getColumnIndex(ContactsContract.Data.DISPLAY_NAME_PRIMARY))
+                val name =
+                    it.getString(it.getColumnIndex(ContactsContract.Data.DISPLAY_NAME_PRIMARY))
                 if (it.getInt(it.getColumnIndex(ContactsContract.Data.HAS_PHONE_NUMBER)) > 0) {
-                    contentResolver.query(
+                    context.contentResolver.query(
                         ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                         null,
                         ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY + " = ?",
@@ -40,37 +37,36 @@ class ContactService : Service() {
                         while (phone.moveToNext()) {
                             val phoneNumber =
                                 phone.getString(phone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                            val contact = Contact(
+                            return Contact(
                                 rowId,
                                 lookupKey,
                                 R.drawable.ic_contact,
                                 name,
-                                phoneNumber,
-                                "",
-                                "",
-                                "",
+                                phoneNumber, "",
+                                "", "",
                                 "",
                                 0,
                             )
-                            Contacts.addContact(contact)
                         }
                     }
                 }
             }
         }
+        return null
     }
 
-    private fun handleContactDetails(lookupKey: String, data: Cursor) {
+    private fun handleContactDetails(lookupKey: String, data: Cursor): Contact? {
         data.use {
             while (data.moveToNext()) {
                 val rowId = it.getInt(it.getColumnIndex(ContactsContract.Contacts._ID))
-                val name = it.getString(it.getColumnIndex(ContactsContract.Data.DISPLAY_NAME_PRIMARY))
+                val name =
+                    it.getString(it.getColumnIndex(ContactsContract.Data.DISPLAY_NAME_PRIMARY))
                 var phonePrimary = ""
                 var phoneSecondary = ""
                 var emailPrimary = ""
                 var emailSecondary = ""
                 if (it.getInt(it.getColumnIndex(ContactsContract.Data.HAS_PHONE_NUMBER)) > 0) {
-                    contentResolver.query(
+                    context.contentResolver.query(
                         ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                         null,
                         ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY + " = ?",
@@ -94,7 +90,7 @@ class ContactService : Service() {
                     }
                 }
 
-                contentResolver.query(
+                context.contentResolver.query(
                     ContactsContract.CommonDataKinds.Email.CONTENT_LOOKUP_URI,
                     null,
                     ContactsContract.CommonDataKinds.Email.LOOKUP_KEY + " = ?",
@@ -122,7 +118,7 @@ class ContactService : Service() {
                         }
                     }
                 }
-                val contact = Contact(
+                return Contact(
                     rowId,
                     lookupKey,
                     R.drawable.ic_contact,
@@ -132,57 +128,104 @@ class ContactService : Service() {
                     "",
                     0,
                 )
-                Contacts.updateContactDetails(lookupKey, contact)
+            }
+        }
+        return null
+    }
+
+    override fun birthdayNotice(contact: Contact): Boolean {
+        val alarmManager =
+            (context.getSystemService(Context.ALARM_SERVICE) as AlarmManager?) ?: return false
+
+        val birthdayNoticeIntent = PendingIntent.getBroadcast(
+            context,
+            contact.rowId,
+            Intent(Const.RECEIVER_INTENT_ACTION_CONTACT_BIRTHDAY),
+            PendingIntent.FLAG_NO_CREATE
+        )
+        return when (birthdayNoticeIntent) {
+            null -> {
+                val pendingIntent = Intent(Const.RECEIVER_INTENT_ACTION_CONTACT_BIRTHDAY).let {
+                    it.putExtra(Const.NOTICE_BIRTHDAY_EXTRA_CONTACT_ID, contact.lookupKey)
+                    it.putExtra(
+                        Const.NOTICE_BIRTHDAY_EXTRA_TEXT,
+                        context.getString(R.string.birthday_notice, contact.name)
+                    )
+                    PendingIntent.getBroadcast(
+                        context, contact.rowId, it,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                    )
+                }
+                val nextBirthday = GregorianCalendar().apply {
+                    val currentDate = GregorianCalendar()
+                    val currentYear = currentDate.get(Calendar.YEAR)
+                    timeInMillis = contact.birthdayTimestamp
+                    set(Calendar.YEAR, currentYear)
+                    if (timeInMillis < currentDate.timeInMillis) {
+                        add(Calendar.YEAR, currentYear + 1)
+                    }
+                    if (get(Calendar.MONTH) == Calendar.FEBRUARY &&
+                        get(Calendar.DAY_OF_MONTH) == 29 &&
+                        !isLeapYear(currentYear)
+                    ) {
+                        add(Calendar.DAY_OF_YEAR, 1)
+                    }
+                }
+                alarmManager.setTimer(
+                    AlarmManager.RTC,
+                    nextBirthday.timeInMillis,
+                    pendingIntent
+                )
+                true
+            }
+            else -> {
+                alarmManager.cancel(birthdayNoticeIntent)
+                birthdayNoticeIntent.cancel()
+                false
             }
         }
     }
 
-    inner class ContactBinder : Binder() {
-        val contactService = object : IContactService {
-            override fun getFirstContact(resultHandler: (Contact?) -> Unit) {
-                val weakReferenceHandler = WeakReference(resultHandler)
-                threadExecutor.execute {
-                    val projection = arrayOf(
-                        ContactsContract.Contacts._ID,
-                        ContactsContract.Data.LOOKUP_KEY,
-                        ContactsContract.Data.DISPLAY_NAME_PRIMARY,
-                        ContactsContract.Data.HAS_PHONE_NUMBER,
-                    )
-                    val data = contentResolver.query(
-                        ContactsContract.Contacts.CONTENT_URI,
-                        projection,
-                        null,
-                        null,
-                        null,
-                    )
-                    Contacts.clearContacts()
-                    if (data != null) {
-                        handleContact(data)
-                    }
-                    weakReferenceHandler.get()?.invoke(Contacts.contacts.firstOrNull())
-                }
-            }
-
-            override fun getContactById(lookupKey: String, resultHandler: (Contact?) -> Unit) {
-                val weakReferenceHandler = WeakReference(resultHandler)
-                threadExecutor.execute {
-                    val contactUri = Uri.withAppendedPath(
-                        ContactsContract.Contacts.CONTENT_LOOKUP_URI,
-                        Uri.encode(lookupKey)
-                    )
-                    val data = contentResolver.query(
-                        contactUri,
-                        null,
-                        null,
-                        null,
-                        null,
-                    )
-                    if (data != null) {
-                        handleContactDetails(lookupKey, data)
-                    }
-                    weakReferenceHandler.get()?.invoke(Contacts.getUserById(lookupKey))
-                }
+    override suspend fun getFirstContact() = withContext(dispatchersProvider.default) {
+        val projection = arrayOf(
+            ContactsContract.Contacts._ID,
+            ContactsContract.Data.LOOKUP_KEY,
+            ContactsContract.Data.DISPLAY_NAME_PRIMARY,
+            ContactsContract.Data.HAS_PHONE_NUMBER,
+        )
+        val data = context.contentResolver.query(
+            ContactsContract.Contacts.CONTENT_URI,
+            projection,
+            null,
+            null,
+            null,
+        )
+        val contacts = mutableListOf<Contact>()
+        if (data != null) {
+            val contact = handleContact(data)
+            if (contact != null) {
+                contacts.add(contact)
             }
         }
+        contacts.firstOrNull()
     }
+
+    override suspend fun getContactById(lookupKey: String) =
+        withContext(dispatchersProvider.default) {
+            val contactUri = Uri.withAppendedPath(
+                ContactsContract.Contacts.CONTENT_LOOKUP_URI,
+                Uri.encode(lookupKey)
+            )
+            val data = context.contentResolver.query(
+                contactUri,
+                null,
+                null,
+                null,
+                null,
+            )
+            if (data == null) {
+                return@withContext null
+            }
+            handleContactDetails(lookupKey, data)
+        }
 }

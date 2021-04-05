@@ -10,8 +10,16 @@ import com.example.fl0wer.Const.NOTICE_BIRTHDAY_EXTRA_CONTACT_ID
 import com.example.fl0wer.Const.NOTICE_BIRTHDAY_EXTRA_TEXT
 import com.example.fl0wer.Const.NOTIFICATION_CHANNEL_ID
 import com.example.fl0wer.Const.RECEIVER_INTENT_ACTION_CONTACT_BIRTHDAY
+import com.example.fl0wer.dispatchers.DispatchersProvider
+import com.example.fl0wer.dispatchers.DispatchersProviderImpl
+import com.example.fl0wer.main.MainActivity
+import com.example.fl0wer.repository.ContactsRepository
+import kotlinx.coroutines.*
 
-class ContactBroadcastReceiver : BroadcastReceiver() {
+class ContactBroadcastReceiver(
+    private val appScope: CoroutineScope = AppScope.scope,
+    private val dispatchersProvider: DispatchersProvider = DispatchersProviderImpl,
+) : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context == null || intent == null) {
             return
@@ -33,15 +41,17 @@ class ContactBroadcastReceiver : BroadcastReceiver() {
             it.putExtra(NOTICE_BIRTHDAY_EXTRA_CONTACT_ID, contactId)
             PendingIntent.getActivity(context, 0, it, FLAG_ONE_SHOT)
         }
-        val contact = Contacts.getUserById(contactId) ?: return
-        NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_contact)
-            .setContentText(text)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .build()
-            .also {
-                context.sendNotification(contact.rowId, it)
-            }
+        appScope.launch(dispatchersProvider.default) {
+            val contact = ContactsRepository.get(context).getContactById(contactId) ?: return@launch
+            NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_contact)
+                .setContentText(text)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .build()
+                .also {
+                    context.sendNotification(contact.rowId, it)
+                }
+        }
     }
 }
