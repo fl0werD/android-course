@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
+        android:name="com.example.fl0wer.App"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -12,15 +13,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Fl0wer">
 
-        <activity android:name="com.example.fl0wer.MainActivity"
+        <activity android:name="com.example.fl0wer.main.MainActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service android:name="com.example.fl0wer.ContactService" />
 
         <receiver android:name="com.example.fl0wer.ContactBroadcastReceiver"
             android:enabled="true"
