@@ -16,4 +16,5 @@
     <string name="birthday">День рождения</string>
     <string name="notice_birthday_name">Напоминание о дне рождения</string>
     <string name="birthday_notice">Сегодня празднует день рождения %s</string>
+    <string name="search_title">Имя</string>
 </resources>

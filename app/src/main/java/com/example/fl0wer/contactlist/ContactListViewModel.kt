@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fl0wer.CiceroneHolder
-import com.example.fl0wer.Contact
 import com.example.fl0wer.Screens
+import com.example.fl0wer.nullOr
 import com.example.fl0wer.repository.ContactsRepository
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
@@ -17,7 +17,9 @@ import java.io.IOException
 class ContactListViewModel(
     private val contactsRepository: ContactsRepository,
 ) : ViewModel() {
-    private val screenState = MutableLiveData<ContactListState>()
+    private val stateLiveData = MutableLiveData<ContactListState>()
+    private val state: ContactListState
+        get() = stateLiveData.value ?: throw IllegalStateException("state value should not be null")
     private val exceptionHandler = CoroutineExceptionHandler { _, t ->
         Timber.e(t)
     }
@@ -28,25 +30,36 @@ class ContactListViewModel(
     }
 
     fun getScreenState(): LiveData<ContactListState> {
-        return screenState
+        return stateLiveData
     }
 
-    fun openContact(contact: Contact) {
+    fun contactClicked(position: Int) {
+        val currentState = state.nullOr<ContactListState.Idle>() ?: return
+        val contact = currentState.contacts[position]
         CiceroneHolder.router.navigateTo(Screens.contactDetails(contact.lookupKey))
+    }
+
+    fun searchTextChanged(nameFilter: String) {
+        state.nullOr<ContactListState.Idle>() ?: return
+        vmScope.launch {
+            stateLiveData.value = ContactListState.Loading
+            try {
+                val contacts = contactsRepository.getSearchedContacts(nameFilter.trim())
+                stateLiveData.value = ContactListState.Idle(contacts)
+            } catch (e: IOException) {
+                stateLiveData.value = ContactListState.Empty
+            }
+        }
     }
 
     private fun getContacts() {
         vmScope.launch {
-            screenState.value = ContactListState.Loading
+            stateLiveData.value = ContactListState.Loading
             try {
-                val contact = contactsRepository.getFirstContact()
-                if (contact != null) {
-                    screenState.value = ContactListState.Idle(contact)
-                } else {
-                    screenState.value = ContactListState.Empty
-                }
+                val contacts = contactsRepository.getContacts()
+                stateLiveData.value = ContactListState.Idle(contacts)
             } catch (e: IOException) {
-                screenState.value = ContactListState.Empty
+                stateLiveData.value = ContactListState.Empty
             }
         }
     }

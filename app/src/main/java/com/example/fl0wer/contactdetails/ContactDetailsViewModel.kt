@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fl0wer.CiceroneHolder
+import com.example.fl0wer.contactlist.ContactListState
+import com.example.fl0wer.nullOr
 import com.example.fl0wer.repository.ContactsRepository
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
@@ -16,7 +18,9 @@ class ContactDetailsViewModel(
     private val contactsRepository: ContactsRepository,
     param: String,
 ) : ViewModel() {
-    private val screenState = MutableLiveData<ContactDetailsState>()
+    private val stateLiveData = MutableLiveData<ContactDetailsState>()
+    private val state: ContactDetailsState
+        get() = stateLiveData.value ?: throw IllegalStateException("state value should not be null")
     private val exceptionHandler = CoroutineExceptionHandler { _, t ->
         Timber.e(t)
     }
@@ -27,19 +31,13 @@ class ContactDetailsViewModel(
     }
 
     fun getScreenState(): LiveData<ContactDetailsState> {
-        return screenState
+        return stateLiveData
     }
 
     fun changeBirthdayNotice() {
-        val currentState = when (screenState.value) {
-            is ContactDetailsState.Idle -> {
-                screenState.value as ContactDetailsState.Idle
-            }
-            else -> null
-        } ?: return
-
+        val currentState = state.nullOr<ContactDetailsState.Idle>() ?: return
         val birthdayNotice = contactsRepository.birthdayNotice(currentState.contact)
-        screenState.value = currentState.copy(
+        stateLiveData.value = currentState.copy(
             birthdayNotice = birthdayNotice,
         )
     }
@@ -50,19 +48,19 @@ class ContactDetailsViewModel(
 
     private fun getContactById(lookupKey: String) {
         vmScope.launch {
-            screenState.value = ContactDetailsState.Loading
+            stateLiveData.value = ContactDetailsState.Loading
             try {
                 val contact = contactsRepository.getContactById(lookupKey)
                 if (contact != null) {
-                    screenState.value = ContactDetailsState.Idle(
+                    stateLiveData.value = ContactDetailsState.Idle(
                         contact,
                         false,
                     )
                 } else {
-                    screenState.value = ContactDetailsState.Error
+                    stateLiveData.value = ContactDetailsState.Error
                 }
             } catch (e: IOException) {
-                screenState.value = ContactDetailsState.Error
+                stateLiveData.value = ContactDetailsState.Error
             }
         }
     }

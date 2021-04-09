@@ -1,8 +1,9 @@
 package com.example.fl0wer.contactdetails
 
 import com.example.fl0wer.Contact
+import com.example.fl0wer.ScreenState
 
-sealed class ContactDetailsState {
+sealed class ContactDetailsState : ScreenState {
     data class Idle(
         val contact: Contact,
         val birthdayNotice: Boolean,

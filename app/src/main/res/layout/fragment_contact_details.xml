@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:fillViewport="true"
             android:visibility="gone"
-            tools:visibility="visible" >
+            tools:visibility="visible">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -153,8 +153,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_toEndOf="@+id/birthday"
-                        tools:srcCompat="@drawable/ic_notifications_none"
-                        tools:ignore="contentDescription"/>
+                        tools:ignore="contentDescription"
+                        tools:srcCompat="@drawable/ic_notifications_none" />
                 </RelativeLayout>
 
                 <TextView
