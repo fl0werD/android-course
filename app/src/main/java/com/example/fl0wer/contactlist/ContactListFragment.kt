@@ -3,9 +3,11 @@ package com.example.fl0wer.contactlist
 import android.os.Bundle
 import android.view.View
 import android.viewbinding.library.fragment.viewBinding
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.fl0wer.R
 import com.example.fl0wer.databinding.FragmentContactListBinding
 import com.example.fl0wer.repository.ContactsRepository
@@ -22,6 +24,12 @@ class ContactListFragment : Fragment(
     private val viewModel: ContactListViewModel by viewModels {
         viewModelFactory
     }
+    private val contactsAdapter by lazy {
+        ContactsAdapter(
+            { binding.contactsList.layoutManager?.scrollToPosition(0) },
+            { position -> viewModel.contactClicked(position) }
+        )
+    }
 
     companion object {
         fun newInstance() = ContactListFragment()
@@ -29,6 +37,23 @@ class ContactListFragment : Fragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        with(binding.contactsList) {
+            layoutManager = LinearLayoutManager(context).apply { recycleChildrenOnDetach = true }
+            adapter = contactsAdapter
+            addItemDecoration(contactItemDecorator(context))
+        }
+        with(view.findViewById<SearchView>(R.id.app_bar_search)) {
+            setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String): Boolean {
+                    return false
+                }
+
+                override fun onQueryTextChange(newText: String): Boolean {
+                    viewModel.searchTextChanged(newText)
+                    return true
+                }
+            })
+        }
         viewModel.getScreenState().observe(viewLifecycleOwner, {
             when (it) {
                 is ContactListState.Idle -> drawIdleState(it)
@@ -41,31 +66,22 @@ class ContactListFragment : Fragment(
     private fun drawEmptyState() {
         with(binding) {
             loadingBar.isVisible = false
-            scrollView.isVisible = true
+            contactsList.isVisible = true
         }
     }
 
     private fun drawLoadingState() {
         with(binding) {
             loadingBar.isVisible = true
-            scrollView.isVisible = false
+            contactsList.isVisible = false
         }
     }
 
     private fun drawIdleState(state: ContactListState.Idle) {
-        val contact = state.contact
+        contactsAdapter.items = state.contacts
         with(binding) {
             loadingBar.isVisible = false
-            scrollView.isVisible = true
-            with(contactCard) {
-                root.isVisible = true
-                root.setOnClickListener {
-                    viewModel.openContact(contact)
-                }
-                photo.setImageResource(contact.photo)
-                name.text = contact.name
-                phoneNumber.text = contact.phone
-            }
+            contactsList.isVisible = true
         }
     }
 }

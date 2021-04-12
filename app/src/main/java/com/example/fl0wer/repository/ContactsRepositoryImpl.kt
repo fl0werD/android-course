@@ -19,119 +19,7 @@ class ContactsRepositoryImpl(
     private val context: Context,
     private val dispatchersProvider: DispatchersProvider,
 ) : ContactsRepository {
-    private fun handleContact(data: Cursor): Contact? {
-        data.use {
-            while (data.moveToNext()) {
-                val rowId = it.getInt(it.getColumnIndex(ContactsContract.Contacts._ID))
-                val lookupKey = it.getString(it.getColumnIndex(ContactsContract.Data.LOOKUP_KEY))
-                val name =
-                    it.getString(it.getColumnIndex(ContactsContract.Data.DISPLAY_NAME_PRIMARY))
-                if (it.getInt(it.getColumnIndex(ContactsContract.Data.HAS_PHONE_NUMBER)) > 0) {
-                    context.contentResolver.query(
-                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                        null,
-                        ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY + " = ?",
-                        arrayOf(lookupKey),
-                        null,
-                    )?.use { phone ->
-                        while (phone.moveToNext()) {
-                            val phoneNumber =
-                                phone.getString(phone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                            return Contact(
-                                rowId,
-                                lookupKey,
-                                R.drawable.ic_contact,
-                                name,
-                                phoneNumber, "",
-                                "", "",
-                                "",
-                                0,
-                            )
-                        }
-                    }
-                }
-            }
-        }
-        return null
-    }
-
-    private fun handleContactDetails(lookupKey: String, data: Cursor): Contact? {
-        data.use {
-            while (data.moveToNext()) {
-                val rowId = it.getInt(it.getColumnIndex(ContactsContract.Contacts._ID))
-                val name =
-                    it.getString(it.getColumnIndex(ContactsContract.Data.DISPLAY_NAME_PRIMARY))
-                var phonePrimary = ""
-                var phoneSecondary = ""
-                var emailPrimary = ""
-                var emailSecondary = ""
-                if (it.getInt(it.getColumnIndex(ContactsContract.Data.HAS_PHONE_NUMBER)) > 0) {
-                    context.contentResolver.query(
-                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                        null,
-                        ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY + " = ?",
-                        arrayOf(lookupKey),
-                        null,
-                    )?.use { phone ->
-                        while (phone.moveToNext()) {
-                            when (phone.getInt(phone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE))) {
-                                ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE -> {
-                                    phonePrimary = phone.getString(
-                                        phone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-                                    )
-                                }
-                                else -> {
-                                    phoneSecondary = phone.getString(
-                                        phone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-                context.contentResolver.query(
-                    ContactsContract.CommonDataKinds.Email.CONTENT_LOOKUP_URI,
-                    null,
-                    ContactsContract.CommonDataKinds.Email.LOOKUP_KEY + " = ?",
-                    arrayOf(lookupKey),
-                    null,
-                )?.use { email ->
-                    while (email.moveToNext()) {
-                        when (email.getInt(email.getColumnIndex(ContactsContract.CommonDataKinds.Email.TYPE))) {
-                            ContactsContract.CommonDataKinds.Email.TYPE_WORK -> {
-                                emailPrimary =
-                                    email.getString(
-                                        email.getColumnIndex(
-                                            ContactsContract.CommonDataKinds.Email.LABEL
-                                        )
-                                    )
-                            }
-                            else -> {
-                                emailSecondary =
-                                    email.getString(
-                                        email.getColumnIndex(
-                                            ContactsContract.CommonDataKinds.Email.LABEL
-                                        )
-                                    )
-                            }
-                        }
-                    }
-                }
-                return Contact(
-                    rowId,
-                    lookupKey,
-                    R.drawable.ic_contact,
-                    name,
-                    phonePrimary, phoneSecondary,
-                    emailPrimary, emailSecondary,
-                    "",
-                    0,
-                )
-            }
-        }
-        return null
-    }
+    private val contacts = mutableListOf<Contact>()
 
     override fun birthdayNotice(contact: Contact): Boolean {
         val alarmManager =
@@ -186,46 +74,126 @@ class ContactsRepositoryImpl(
         }
     }
 
-    override suspend fun getFirstContact() = withContext(dispatchersProvider.default) {
-        val projection = arrayOf(
-            ContactsContract.Contacts._ID,
-            ContactsContract.Data.LOOKUP_KEY,
-            ContactsContract.Data.DISPLAY_NAME_PRIMARY,
-            ContactsContract.Data.HAS_PHONE_NUMBER,
-        )
-        val data = context.contentResolver.query(
-            ContactsContract.Contacts.CONTENT_URI,
-            projection,
-            null,
-            null,
-            null,
-        )
-        val contacts = mutableListOf<Contact>()
-        if (data != null) {
-            val contact = handleContact(data)
-            if (contact != null) {
-                contacts.add(contact)
+    override suspend fun getContacts() =
+        withContext(dispatchersProvider.default) {
+            val projection = arrayOf(
+                ContactsContract.Contacts._ID,
+                ContactsContract.Data.LOOKUP_KEY,
+                ContactsContract.Data.DISPLAY_NAME_PRIMARY,
+            )
+            contacts.clear()
+            context.contentResolver.query(
+                ContactsContract.Contacts.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null,
+            )?.use {
+                while (it.moveToNext()) {
+                    val contact = handleContact(it)
+                    contacts.add(contact)
+                }
             }
+            contacts
         }
-        contacts.firstOrNull()
-    }
 
     override suspend fun getContactById(lookupKey: String) =
         withContext(dispatchersProvider.default) {
+            if (contacts.isNotEmpty()) {
+                return@withContext contacts.firstOrNull {
+                    it.lookupKey == lookupKey
+                }
+            }
+
             val contactUri = Uri.withAppendedPath(
                 ContactsContract.Contacts.CONTENT_LOOKUP_URI,
                 Uri.encode(lookupKey)
             )
-            val data = context.contentResolver.query(
+            context.contentResolver.query(
                 contactUri,
                 null,
                 null,
                 null,
                 null,
-            )
-            if (data == null) {
-                return@withContext null
+            )?.use {
+                while (it.moveToNext()) {
+                    return@withContext handleContact(it)
+                }
             }
-            handleContactDetails(lookupKey, data)
+            return@withContext null
         }
+
+    override suspend fun getSearchedContacts(nameFilter: String) =
+        withContext(dispatchersProvider.default) {
+            if (nameFilter.isNotEmpty()) {
+                contacts.filter {
+                    it.name.contains(nameFilter, true)
+                }
+            } else {
+                contacts
+            }
+        }
+
+    private fun handleContact(data: Cursor): Contact {
+        val rowId = data.getInt(data.getColumnIndex(ContactsContract.Contacts._ID))
+        val lookupKey = data.getString(ContactsContract.Data.LOOKUP_KEY)
+        val name = data.getString(ContactsContract.Data.DISPLAY_NAME_PRIMARY)
+        var phone = ""
+        var phone2 = ""
+        var email = ""
+        var email2 = ""
+
+        context.contentResolver.query(
+            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            null,
+            ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY + " = ?",
+            arrayOf(lookupKey),
+            null,
+        )?.use {
+            while (it.moveToNext()) {
+                when (it.getInt(it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE))) {
+                    ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE -> {
+                        phone = it.getString(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                    }
+                    else -> {
+                        phone2 = it.getString(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                    }
+                }
+            }
+        }
+
+        context.contentResolver.query(
+            ContactsContract.CommonDataKinds.Email.CONTENT_LOOKUP_URI,
+            null,
+            ContactsContract.CommonDataKinds.Email.LOOKUP_KEY + " = ?",
+            arrayOf(lookupKey),
+            null,
+        )?.use {
+            while (it.moveToNext()) {
+                when (it.getInt(it.getColumnIndex(ContactsContract.CommonDataKinds.Email.TYPE))) {
+                    ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE -> {
+                        email = it.getString(ContactsContract.CommonDataKinds.Email.LABEL)
+                    }
+                    else -> {
+                        email2 = it.getString(ContactsContract.CommonDataKinds.Email.LABEL)
+                    }
+                }
+            }
+        }
+
+        return Contact(
+            rowId,
+            lookupKey,
+            R.drawable.ic_contact,
+            name,
+            phone, phone2,
+            email, email2,
+            "",
+            0,
+        )
+    }
+
+    private fun Cursor.getString(columnName: String): String {
+        return getString(getColumnIndex(columnName))
+    }
 }

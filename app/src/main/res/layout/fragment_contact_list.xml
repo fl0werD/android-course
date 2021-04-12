@@ -15,6 +15,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:menu="@menu/contact_list"
             app:title="@string/contacts_list"
             app:titleTextColor="@color/white" />
     </com.google.android.material.appbar.AppBarLayout>
@@ -30,23 +31,12 @@
             android:layout_gravity="center"
             tools:visibility="gone" />
 
-        <ScrollView
-            android:id="@+id/scroll_view"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/contacts_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true"
+            android:scrollbars="vertical"
             android:visibility="gone"
-            tools:visibility="visible">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <include
-                    android:id="@+id/contact_card"
-                    layout="@layout/item_contact_card" />
-            </LinearLayout>
-        </ScrollView>
+            tools:visibility="visible" />
     </FrameLayout>
 </LinearLayout>
