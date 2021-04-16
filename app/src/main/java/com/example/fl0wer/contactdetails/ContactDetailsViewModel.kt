@@ -3,31 +3,29 @@ package com.example.fl0wer.contactdetails
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.fl0wer.CiceroneHolder
-import com.example.fl0wer.contactlist.ContactListState
+import com.example.fl0wer.dispatchers.DispatchersProvider
 import com.example.fl0wer.nullOr
 import com.example.fl0wer.repository.ContactsRepository
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
-import timber.log.Timber
-import java.io.IOException
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 class ContactDetailsViewModel(
     private val contactsRepository: ContactsRepository,
+    private val dispatchersProvider: DispatchersProvider,
     param: String,
 ) : ViewModel() {
+    private val disposables = CompositeDisposable()
     private val stateLiveData = MutableLiveData<ContactDetailsState>()
     private val state: ContactDetailsState
         get() = stateLiveData.value ?: throw IllegalStateException("state value should not be null")
-    private val exceptionHandler = CoroutineExceptionHandler { _, t ->
-        Timber.e(t)
-    }
-    private val vmScope = viewModelScope + exceptionHandler
 
     init {
         getContactById(param)
+    }
+
+    override fun onCleared() {
+        disposables.dispose()
+        super.onCleared()
     }
 
     fun getScreenState(): LiveData<ContactDetailsState> {
@@ -47,21 +45,21 @@ class ContactDetailsViewModel(
     }
 
     private fun getContactById(lookupKey: String) {
-        vmScope.launch {
-            stateLiveData.value = ContactDetailsState.Loading
-            try {
-                val contact = contactsRepository.getContactById(lookupKey)
-                if (contact != null) {
+        val contact = contactsRepository.getContactById(lookupKey)
+            .subscribeOn(dispatchersProvider.io)
+            .observeOn(dispatchersProvider.main)
+            .doOnSubscribe {
+                stateLiveData.value = ContactDetailsState.Loading
+            }
+            .subscribe(
+                { contact ->
                     stateLiveData.value = ContactDetailsState.Idle(
                         contact,
-                        false,
+                        false
                     )
-                } else {
-                    stateLiveData.value = ContactDetailsState.Error
-                }
-            } catch (e: IOException) {
-                stateLiveData.value = ContactDetailsState.Error
-            }
-        }
+                },
+                { stateLiveData.value = ContactDetailsState.Error }
+            )
+        disposables.add(contact)
     }
 }

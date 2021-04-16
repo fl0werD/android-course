@@ -2,19 +2,20 @@ package com.example.fl0wer.repository
 
 import android.content.Context
 import com.example.fl0wer.Contact
-import com.example.fl0wer.dispatchers.DispatchersProviderImpl
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 
 interface ContactsRepository {
     fun birthdayNotice(contact: Contact): Boolean
-    suspend fun getContacts(): List<Contact>
-    suspend fun getContactById(lookupKey: String): Contact?
-    suspend fun getSearchedContacts(nameFilter: String): List<Contact>
+    fun getContacts(): Observable<List<Contact>>
+    fun getContactById(lookupKey: String): Single<Contact>
+    fun getSearchedContacts(nameFilter: String): Observable<List<Contact>>
 
     companion object {
         private var INSTANCE: ContactsRepository? = null
 
         fun get(context: Context): ContactsRepository =
-            INSTANCE ?: ContactsRepositoryImpl(context, DispatchersProviderImpl)
+            INSTANCE ?: ContactsRepositoryImpl(context)
                 .also {
                     INSTANCE = it
                 }

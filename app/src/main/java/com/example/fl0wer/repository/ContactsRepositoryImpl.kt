@@ -10,14 +10,16 @@ import android.provider.ContactsContract
 import com.example.fl0wer.Const
 import com.example.fl0wer.Contact
 import com.example.fl0wer.R
-import com.example.fl0wer.dispatchers.DispatchersProvider
 import com.example.fl0wer.setTimer
-import kotlinx.coroutines.withContext
-import java.util.*
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
+import java.io.IOException
+import java.util.Calendar
+import java.util.GregorianCalendar
+import java.util.Optional
 
 class ContactsRepositoryImpl(
     private val context: Context,
-    private val dispatchersProvider: DispatchersProvider,
 ) : ContactsRepository {
     private val contacts = mutableListOf<Contact>()
 
@@ -74,8 +76,8 @@ class ContactsRepositoryImpl(
         }
     }
 
-    override suspend fun getContacts() =
-        withContext(dispatchersProvider.default) {
+    override fun getContacts(): Observable<List<Contact>> =
+        Observable.defer {
             val projection = arrayOf(
                 ContactsContract.Contacts._ID,
                 ContactsContract.Data.LOOKUP_KEY,
@@ -94,15 +96,15 @@ class ContactsRepositoryImpl(
                     contacts.add(contact)
                 }
             }
-            contacts
+            return@defer Observable.just(contacts)
         }
 
-    override suspend fun getContactById(lookupKey: String) =
-        withContext(dispatchersProvider.default) {
+    override fun getContactById(lookupKey: String): Single<Contact> =
+        Single.defer {
             if (contacts.isNotEmpty()) {
-                return@withContext contacts.firstOrNull {
+                return@defer Single.just(contacts.firstOrNull {
                     it.lookupKey == lookupKey
-                }
+                })
             }
 
             val contactUri = Uri.withAppendedPath(
@@ -117,20 +119,20 @@ class ContactsRepositoryImpl(
                 null,
             )?.use {
                 while (it.moveToNext()) {
-                    return@withContext handleContact(it)
+                    return@defer Single.just(handleContact(it))
                 }
             }
-            return@withContext null
+            return@defer Single.error(IOException("Invalid contact"))
         }
 
-    override suspend fun getSearchedContacts(nameFilter: String) =
-        withContext(dispatchersProvider.default) {
+    override fun getSearchedContacts(nameFilter: String): Observable<List<Contact>> =
+        Observable.defer {
             if (nameFilter.isNotEmpty()) {
-                contacts.filter {
+                return@defer Observable.just(contacts.filter {
                     it.name.contains(nameFilter, true)
-                }
+                })
             } else {
-                contacts
+                return@defer Observable.just(contacts)
             }
         }
 

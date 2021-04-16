@@ -1,11 +1,9 @@
 package com.example.fl0wer.dispatchers
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.MainCoroutineDispatcher
+import io.reactivex.rxjava3.core.Scheduler
 
 interface DispatchersProvider {
-    val default: CoroutineDispatcher
-    val main: MainCoroutineDispatcher
-    val unconfined: CoroutineDispatcher
-    val io: CoroutineDispatcher
+    val default: Scheduler
+    val main: Scheduler
+    val io: Scheduler
 }
