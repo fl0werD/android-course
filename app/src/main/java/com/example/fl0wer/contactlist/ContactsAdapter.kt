@@ -58,8 +58,8 @@ val contactDiffCallback = object : DiffUtil.ItemCallback<Contact>() {
 }
 
 class ContactsAdapter(
-    private val scrollToTopListener: () -> (Unit),
-    private val contactClickListener: (Int) -> (Unit),
+    private val scrollToTopListener: () -> Unit,
+    private val contactClickListener: (Int) -> Unit,
 ) : ListAdapter<Contact, ContactsAdapter.ViewHolder>(contactDiffCallback) {
     var items = listOf<Contact>()
         set(value) = submitList(value)
@@ -106,12 +106,10 @@ class ContactsAdapter(
             }
         }
 
-        fun bind(contact: Contact) {
-            with(binding) {
-                photo.setImageResource(contact.photo)
-                name.text = contact.name
-                phoneNumber.text = contact.phone
-            }
+        fun bind(contact: Contact) = with(binding) {
+            photo.setImageResource(contact.photo)
+            name.text = contact.name
+            phoneNumber.text = contact.phone
         }
     }
 }

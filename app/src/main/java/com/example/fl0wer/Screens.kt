@@ -2,14 +2,19 @@ package com.example.fl0wer
 
 import com.example.fl0wer.contactdetails.ContactDetailsFragment
 import com.example.fl0wer.contactlist.ContactListFragment
-import com.github.terrakok.cicerone.androidx.FragmentScreen
+import com.github.terrakok.modo.android.AppScreen
+import kotlinx.parcelize.Parcelize
 
 object Screens {
-    fun contactList() = FragmentScreen {
-        ContactListFragment.newInstance()
+    @Parcelize
+    class ContactList : AppScreen("ContactList") {
+        override fun create() = ContactListFragment.newInstance()
     }
 
-    fun contactDetails(contactId: String) = FragmentScreen {
-        ContactDetailsFragment.newInstance(contactId)
+    @Parcelize
+    class ContactDetails(
+        private val contactId: String,
+    ) : AppScreen("Contact_$contactId") {
+        override fun create() = ContactDetailsFragment.newInstance(contactId)
     }
 }

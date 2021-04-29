@@ -1,66 +1,81 @@
 package com.example.fl0wer.contactdetails
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.fl0wer.CiceroneHolder
-import com.example.fl0wer.contactlist.ContactListState
 import com.example.fl0wer.nullOr
 import com.example.fl0wer.repository.ContactsRepository
+import com.github.terrakok.modo.Modo
+import com.github.terrakok.modo.back
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import java.io.IOException
+import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import timber.log.Timber
-import java.io.IOException
 
-class ContactDetailsViewModel(
+class ContactDetailsViewModel @AssistedInject constructor(
     private val contactsRepository: ContactsRepository,
-    param: String,
+    private val modo: Modo,
+    @Assisted contactId: String,
 ) : ViewModel() {
-    private val stateLiveData = MutableLiveData<ContactDetailsState>()
-    private val state: ContactDetailsState
-        get() = stateLiveData.value ?: throw IllegalStateException("state value should not be null")
-    private val exceptionHandler = CoroutineExceptionHandler { _, t ->
-        Timber.e(t)
+    private val _uiState = MutableStateFlow<ContactDetailsState>(ContactDetailsState.Loading)
+    val uiState: StateFlow<ContactDetailsState> get() = _uiState
+    private val vmScope = viewModelScope + CoroutineExceptionHandler { _, e ->
+        if (e !is CancellationException) {
+            Timber.e(e)
+        }
     }
-    private val vmScope = viewModelScope + exceptionHandler
 
     init {
-        getContactById(param)
-    }
-
-    fun getScreenState(): LiveData<ContactDetailsState> {
-        return stateLiveData
+        getContactById(contactId)
     }
 
     fun changeBirthdayNotice() {
-        val currentState = state.nullOr<ContactDetailsState.Idle>() ?: return
+        val currentState = uiState.value.nullOr<ContactDetailsState.Idle>() ?: return
         val birthdayNotice = contactsRepository.birthdayNotice(currentState.contact)
-        stateLiveData.value = currentState.copy(
+        _uiState.value = currentState.copy(
             birthdayNotice = birthdayNotice,
         )
     }
 
     fun backPressed() {
-        CiceroneHolder.router.exit()
+        modo.back()
     }
 
     private fun getContactById(lookupKey: String) {
         vmScope.launch {
-            stateLiveData.value = ContactDetailsState.Loading
+            _uiState.value = ContactDetailsState.Loading
             try {
                 val contact = contactsRepository.getContactById(lookupKey)
                 if (contact != null) {
-                    stateLiveData.value = ContactDetailsState.Idle(
+                    _uiState.value = ContactDetailsState.Idle(
                         contact,
-                        false,
+                        false
                     )
                 } else {
-                    stateLiveData.value = ContactDetailsState.Error
+                    _uiState.value = ContactDetailsState.Failure
                 }
             } catch (e: IOException) {
-                stateLiveData.value = ContactDetailsState.Error
+                _uiState.value = ContactDetailsState.Failure
+            }
+        }
+    }
+
+    companion object {
+        fun provideFactory(
+            assistedFactory: ContactDetailsViewModelFactory,
+            contactId: String,
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return assistedFactory.create(contactId) as T
             }
         }
     }
