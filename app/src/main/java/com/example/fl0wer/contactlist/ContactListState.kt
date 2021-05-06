@@ -1,13 +1,18 @@
 package com.example.fl0wer.contactlist
 
 import com.example.fl0wer.Contact
-import com.example.fl0wer.ScreenState
+import com.example.fl0wer.UiState
+import kotlinx.parcelize.Parcelize
 
-sealed class ContactListState : ScreenState {
+sealed class ContactListState : UiState {
+    @Parcelize
     data class Idle(
         val contacts: List<Contact>,
     ) : ContactListState()
 
+    @Parcelize
     object Loading : ContactListState()
-    object Empty : ContactListState()
+
+    @Parcelize
+    object Failure : ContactListState()
 }

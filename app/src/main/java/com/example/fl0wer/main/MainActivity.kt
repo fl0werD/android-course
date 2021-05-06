@@ -7,30 +7,46 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.example.fl0wer.CiceroneHolder
+import androidx.lifecycle.ViewModelProvider
+import com.example.fl0wer.App
 import com.example.fl0wer.Const
 import com.example.fl0wer.R
-import com.github.terrakok.cicerone.androidx.AppNavigator
+import com.example.fl0wer.Screens
+import com.github.terrakok.modo.Modo
+import com.github.terrakok.modo.android.ModoRender
+import com.github.terrakok.modo.android.init
+import com.github.terrakok.modo.android.saveState
+import com.github.terrakok.modo.back
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
+    @Inject
+    lateinit var modo: Modo
+    private val modoRender by lazy { ModoRender(this, R.id.fragments_container) }
     private val viewModel: MainViewModel by viewModels()
+
     private val readContactsPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            viewModel.startNavigation()
             handleIntent(intent)
         } else {
             showPermissionRationaleDialog()
         }
     }
-    private val navigator = AppNavigator(this, R.id.fragments_container)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        (application as App).appComponent.inject(this)
         super.onCreate(savedInstanceState)
+        modo.init(savedInstanceState, Screens.ContactList())
         if (savedInstanceState == null) {
             readContactsPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        modo.saveState(outState)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -38,14 +54,18 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         handleIntent(intent)
     }
 
-    override fun onResumeFragments() {
-        super.onResumeFragments()
-        CiceroneHolder.navigatorHolder.setNavigator(navigator)
+    override fun onResume() {
+        super.onResume()
+        modo.render = modoRender
     }
 
     override fun onPause() {
-        CiceroneHolder.navigatorHolder.removeNavigator()
+        modo.render = null
         super.onPause()
+    }
+
+    override fun onBackPressed() {
+        modo.back()
     }
 
     private fun handleIntent(intent: Intent) {

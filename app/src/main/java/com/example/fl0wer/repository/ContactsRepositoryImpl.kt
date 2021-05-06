@@ -12,8 +12,8 @@ import com.example.fl0wer.Contact
 import com.example.fl0wer.R
 import com.example.fl0wer.dispatchers.DispatchersProvider
 import com.example.fl0wer.setTimer
-import kotlinx.coroutines.withContext
 import java.util.*
+import kotlinx.coroutines.withContext
 
 class ContactsRepositoryImpl(
     private val context: Context,

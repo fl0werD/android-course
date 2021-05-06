@@ -1,15 +1,20 @@
 package com.example.fl0wer.main
 
 import androidx.lifecycle.ViewModel
-import com.example.fl0wer.CiceroneHolder
 import com.example.fl0wer.Screens
+import com.github.terrakok.modo.Modo
+import com.github.terrakok.modo.back
+import com.github.terrakok.modo.forward
+import javax.inject.Inject
 
-class MainViewModel : ViewModel() {
-    fun startNavigation() {
-        CiceroneHolder.router.newRootChain(Screens.contactList())
+class MainViewModel @Inject constructor(
+    private val modo: Modo,
+) : ViewModel() {
+    fun openContact(contactId: String) {
+        modo.forward(Screens.ContactDetails(contactId))
     }
 
-    fun openContact(contactId: String) {
-        CiceroneHolder.router.navigateTo(Screens.contactDetails(contactId))
+    fun backPressed() {
+        modo.back()
     }
 }

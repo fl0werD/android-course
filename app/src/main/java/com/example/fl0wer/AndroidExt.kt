@@ -1,15 +1,15 @@
 package com.example.fl0wer
 
-import android.app.*
+import android.app.AlarmManager
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
-import android.content.res.Resources
 import android.os.Build
 import androidx.core.app.NotificationManagerCompat
 import com.example.fl0wer.Const.NOTIFICATION_CHANNEL_ID
-
-val Int.dpToPx: Int
-    get() = (this * Resources.getSystem().displayMetrics.density).toInt()
 
 fun AlarmManager.setTimer(type: Int, triggerAtMillis: Long, operation: PendingIntent) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
