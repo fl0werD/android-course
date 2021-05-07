@@ -1,2 +1,6 @@
-include ':app'
 rootProject.name = "fl0wer"
+include(
+        ":domain",
+        ":data",
+        ":presentation",
+)
