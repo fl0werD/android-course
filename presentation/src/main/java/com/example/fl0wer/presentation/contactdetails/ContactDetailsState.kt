@@ -8,7 +8,7 @@ sealed class ContactDetailsState : UiState {
     @Parcelize
     data class Idle(
         val contact: ContactParcelable,
-        val birthdayReminder: Boolean,
+        val birthdayReminder: Boolean = false,
     ) : ContactDetailsState()
 
     @Parcelize

@@ -15,6 +15,7 @@ data class ContactParcelable(
     val phone2: String,
     val email: String,
     val email2: String,
-    val birthdayTimestamp: Long,
+    val birthdayMonth: Int,
+    val birthdayDayOfMonth: Int,
     val note: String,
 ) : Parcelable

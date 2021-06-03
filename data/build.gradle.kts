@@ -19,10 +19,6 @@ dependencies {
     implementation(project(":domain"))
 
     val coroutinesVersion = properties["version.kotlinx.coroutines"]
-    val daggerVersion = properties["dagger_version"]
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
-
-    implementation("com.google.dagger:dagger:$daggerVersion")
-    kapt("com.google.dagger:dagger-compiler:$daggerVersion")
 }
