@@ -13,7 +13,8 @@ object ContactMapper : Mapper<Contact, ContactParcelable> {
         phone2 = from.phone2,
         email = from.email,
         email2 = from.email2,
-        birthdayTimestamp = from.birthdayTimestamp,
+        birthdayMonth = from.birthdayMonth,
+        birthdayDayOfMonth = from.birthdayDayOfMonth,
         note = from.note,
     )
 }
@@ -28,7 +29,8 @@ object ContactParcelableMapper : Mapper<ContactParcelable, Contact> {
         phone2 = from.phone2,
         email = from.email,
         email2 = from.email2,
-        birthdayTimestamp = from.birthdayTimestamp,
+        birthdayMonth = from.birthdayMonth,
+        birthdayDayOfMonth = from.birthdayDayOfMonth,
         note = from.note,
     )
 }

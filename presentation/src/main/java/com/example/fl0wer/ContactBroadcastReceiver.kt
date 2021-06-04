@@ -13,7 +13,8 @@ import com.example.fl0wer.contacts.ContactsInteractor
 import com.example.fl0wer.dispatchers.DispatchersProvider
 import com.example.fl0wer.presentation.main.MainActivity
 import javax.inject.Inject
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class ContactBroadcastReceiver : BroadcastReceiver() {
     @Inject

@@ -6,6 +6,7 @@ import java.util.GregorianCalendar
 
 class ContactsInteractorImpl(
     private val contactsRepository: ContactsRepository,
+    private val reminderRepository: ReminderRepository,
 ) : ContactsInteractor {
     override suspend fun contacts(): List<Contact> {
         val contacts = contactsRepository.contacts()
@@ -27,33 +28,6 @@ class ContactsInteractorImpl(
             }
         } else {
             contactsRepository.contacts()
-        }
-    }
-
-    override suspend fun birthdayNotice(contact: Contact): Boolean {
-        return contactsRepository.getBirthdayReminder(contact)
-    }
-
-    override suspend fun birthdayReminder(contact: Contact, enabled: Boolean) {
-        if (enabled) {
-            val nextBirthday = GregorianCalendar().apply {
-                val currentDate = GregorianCalendar()
-                val currentYear = currentDate.get(Calendar.YEAR)
-                timeInMillis = contact.birthdayTimestamp
-                set(Calendar.YEAR, currentYear)
-                if (timeInMillis < currentDate.timeInMillis) {
-                    add(Calendar.YEAR, currentYear + 1)
-                }
-                if (get(Calendar.MONTH) == Calendar.FEBRUARY &&
-                    get(Calendar.DAY_OF_MONTH) == 29 &&
-                    !isLeapYear(currentYear)
-                ) {
-                    add(Calendar.DAY_OF_YEAR, 1)
-                }
-            }
-            contactsRepository.addBirthdayReminder(contact, nextBirthday.timeInMillis)
-        } else {
-            contactsRepository.removeBirthdayReminder(contact)
         }
     }
 }

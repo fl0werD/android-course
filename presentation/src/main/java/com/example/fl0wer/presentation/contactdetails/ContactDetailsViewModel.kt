@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.fl0wer.contacts.ContactsInteractor
+import com.example.fl0wer.contacts.ReminderInteractor
 import com.example.fl0wer.mapper.ContactMapper
 import com.example.fl0wer.mapper.ContactParcelableMapper
 import com.example.fl0wer.nullOr
@@ -20,8 +21,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import timber.log.Timber
 
+@Suppress("SwallowedException")
 class ContactDetailsViewModel @AssistedInject constructor(
     private val contactsInteractor: ContactsInteractor,
+    private val reminderInteractor: ReminderInteractor,
     private val modo: Modo,
     @Assisted contactId: String,
 ) : ViewModel() {
@@ -41,12 +44,8 @@ class ContactDetailsViewModel @AssistedInject constructor(
         val currentState = uiState.value.nullOr<ContactDetailsState.Idle>() ?: return
         vmScope.launch {
             try {
-                val birthdayReminder = !currentState.birthdayReminder
-                contactsInteractor.birthdayReminder(
-                    ContactParcelableMapper.map(currentState.contact),
-                    birthdayReminder
-                )
-                _uiState.value = currentState.copy(birthdayReminder = birthdayReminder)
+                reminderInteractor.changeBirthdayReminder(ContactParcelableMapper.map(currentState.contact))
+                _uiState.value = currentState.copy(birthdayReminder = !currentState.birthdayReminder)
             } catch (e: IOException) {
                 _uiState.value = ContactDetailsState.Failure
             }
@@ -63,10 +62,9 @@ class ContactDetailsViewModel @AssistedInject constructor(
             try {
                 val contact = contactsInteractor.contact(lookupKey)
                 if (contact != null) {
-                    val birthdayNotice = contactsInteractor.birthdayNotice(contact)
                     _uiState.value = ContactDetailsState.Idle(
                         ContactMapper.map(contact),
-                        birthdayNotice,
+                        reminderInteractor.birthdayReminder(contact),
                     )
                 } else {
                     _uiState.value = ContactDetailsState.Failure

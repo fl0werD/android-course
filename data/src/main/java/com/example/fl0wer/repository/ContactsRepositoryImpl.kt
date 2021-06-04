@@ -1,26 +1,19 @@
 package com.example.fl0wer.repository
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
-import android.util.Log
-import com.example.fl0wer.Const
 import com.example.fl0wer.Contact
 import com.example.fl0wer.contacts.ContactsRepository
 import com.example.fl0wer.dispatchers.DispatchersProvider
-import com.example.fl0wer.getAlarmManager
-import com.example.fl0wer.setTimer
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.*
-import javax.inject.Inject
+import java.util.GregorianCalendar
+import java.util.Locale
 import kotlinx.coroutines.withContext
 
-class ContactsRepositoryImpl @Inject constructor(
+class ContactsRepositoryImpl(
     private val context: Context,
     private val dispatchersProvider: DispatchersProvider,
 ) : ContactsRepository {
@@ -51,7 +44,7 @@ class ContactsRepositoryImpl @Inject constructor(
             contacts
         }
 
-    override suspend fun contact(lookupKey: String): Contact? =
+    override suspend fun contact(lookupKey: String) =
         withContext(dispatchersProvider.default) {
             if (contacts.isNotEmpty()) {
                 return@withContext contacts.firstOrNull {
@@ -77,45 +70,6 @@ class ContactsRepositoryImpl @Inject constructor(
             return@withContext null
         }
 
-    override suspend fun getBirthdayReminder(contact: Contact): Boolean =
-        withContext(dispatchersProvider.default) {
-            val birthdayNoticeIntent = PendingIntent.getBroadcast(
-                context,
-                contact.id,
-                Intent(Const.RECEIVER_INTENT_ACTION_CONTACT_BIRTHDAY),
-                PendingIntent.FLAG_NO_CREATE,
-            )
-            birthdayNoticeIntent != null
-        }
-
-    override suspend fun addBirthdayReminder(contact: Contact, nextBirthday: Long) =
-        withContext(dispatchersProvider.default) {
-            val alarmManager = getAlarmManager(context) ?: return@withContext
-            val pendingIntent = Intent(Const.RECEIVER_INTENT_ACTION_CONTACT_BIRTHDAY).let {
-                it.putExtra(Const.NOTICE_BIRTHDAY_EXTRA_CONTACT_ID, contact.lookupKey)
-                PendingIntent.getBroadcast(
-                    context,
-                    contact.id,
-                    it,
-                    PendingIntent.FLAG_UPDATE_CURRENT,
-                )
-            }
-            alarmManager.setTimer(AlarmManager.RTC, nextBirthday, pendingIntent)
-        }
-
-    override suspend fun removeBirthdayReminder(contact: Contact) =
-        withContext(dispatchersProvider.default) {
-            val alarmManager = getAlarmManager(context) ?: return@withContext
-            val birthdayNoticeIntent = PendingIntent.getBroadcast(
-                context,
-                contact.id,
-                Intent(Const.RECEIVER_INTENT_ACTION_CONTACT_BIRTHDAY),
-                PendingIntent.FLAG_NO_CREATE,
-            )
-            alarmManager.cancel(birthdayNoticeIntent)
-            birthdayNoticeIntent.cancel()
-        }
-
     private fun handleContact(data: Cursor): Contact? {
         val id = data.getInt(ContactsContract.Contacts._ID) ?: return null
         val lookupKey = data.getString(ContactsContract.Data.LOOKUP_KEY) ?: return null
@@ -124,7 +78,8 @@ class ContactsRepositoryImpl @Inject constructor(
         var phone2 = ""
         var email = ""
         var email2 = ""
-        var birthdayTimestamp = -1L
+        var birthdayMonth = -1
+        var birthdayDayOfMonth = -1
         var note = ""
 
         context.contentResolver.query(
@@ -169,9 +124,9 @@ class ContactsRepositoryImpl @Inject constructor(
             ContactsContract.Data.CONTENT_URI,
             arrayOf(ContactsContract.CommonDataKinds.Event.START_DATE),
             ContactsContract.CommonDataKinds.Event.LOOKUP_KEY + "= ? AND " +
-                    ContactsContract.Data.MIMETYPE + "= ? AND " +
-                    ContactsContract.CommonDataKinds.Event.TYPE + "=" +
-                    ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY,
+                ContactsContract.Data.MIMETYPE + "= ? AND " +
+                ContactsContract.CommonDataKinds.Event.TYPE + "=" +
+                ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY,
             arrayOf(
                 lookupKey,
                 ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE,
@@ -181,10 +136,14 @@ class ContactsRepositoryImpl @Inject constructor(
             while (it.moveToNext()) {
                 val startDate =
                     it.getString(ContactsContract.CommonDataKinds.Event.START_DATE) ?: continue
-                val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val formatter = SimpleDateFormat("MM-dd", Locale.getDefault())
                 try {
                     val date = formatter.parse(startDate)
-                    birthdayTimestamp = date.time
+                    GregorianCalendar().apply {
+                        timeInMillis = date.time
+                        birthdayMonth = get(GregorianCalendar.MONTH)
+                        birthdayDayOfMonth = get(GregorianCalendar.DAY_OF_MONTH)
+                    }
                 } catch (e: ParseException) {
                     continue
                 }
@@ -195,7 +154,7 @@ class ContactsRepositoryImpl @Inject constructor(
             ContactsContract.Data.CONTENT_URI,
             arrayOf(ContactsContract.CommonDataKinds.Note.NOTE),
             ContactsContract.Data.LOOKUP_KEY + "= ? AND " +
-                    ContactsContract.Data.MIMETYPE + "= ?",
+                ContactsContract.Data.MIMETYPE + "= ?",
             arrayOf(
                 lookupKey,
                 ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE,
@@ -215,7 +174,7 @@ class ContactsRepositoryImpl @Inject constructor(
             name,
             phone, phone2,
             email, email2,
-            birthdayTimestamp,
+            birthdayMonth, birthdayDayOfMonth,
             note,
         )
     }

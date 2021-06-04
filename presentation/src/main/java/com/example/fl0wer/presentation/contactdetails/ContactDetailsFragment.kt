@@ -35,7 +35,6 @@ class ContactDetailsFragment : Fragment() {
     private lateinit var binding: FragmentContactDetailsBinding
 
     companion object {
-        private const val BIRTHDAY_DATE_FORMAT = "dd.MM.yyyy"
         private const val ARGUMENT_CONTACT_ID = "ARGUMENT_CONTACT_ID"
 
         fun newInstance(contactId: String) = ContactDetailsFragment().apply {
@@ -95,11 +94,10 @@ class ContactDetailsFragment : Fragment() {
         email2.putText(email2Title, contact.email2)
         note.putText(noteTitle, contact.note)
 
-        if (contact.birthdayTimestamp != -1L) {
+        if (contact.birthdayMonth != -1 && contact.birthdayDayOfMonth != -1) {
             birthdayTitle.isVisible = true
             birthday.isVisible = true
-            birthday.text = SimpleDateFormat(BIRTHDAY_DATE_FORMAT, Locale.getDefault())
-                .format(Date(contact.birthdayTimestamp))
+            birthday.text = getString(R.string.birthday_value, contact.birthdayMonth, contact.birthdayDayOfMonth)
             birthdayNotice.isVisible = true
             if (state.birthdayReminder) {
                 birthdayNotice.setImageResource(R.drawable.ic_notifications_active)
