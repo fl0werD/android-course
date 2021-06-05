@@ -1,4 +1,4 @@
-package com.example.fl0wer.presentation.contactlist
+package com.example.fl0wer.contactlist
 
 import android.content.Context
 import android.os.Bundle
@@ -43,7 +43,9 @@ class ContactListFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ) = FragmentContactListBinding.inflate(inflater, container, false)
         .also { binding = it }
         .root

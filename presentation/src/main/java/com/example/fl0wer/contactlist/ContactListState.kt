@@ -1,4 +1,4 @@
-package com.example.fl0wer.presentation.contactlist
+package com.example.fl0wer.contactlist
 
 import com.example.fl0wer.UiState
 import com.example.fl0wer.data.ContactParcelable

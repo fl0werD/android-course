@@ -1,12 +1,12 @@
-package com.example.fl0wer.presentation.contactlist
+package com.example.fl0wer.contactlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.fl0wer.Screens
 import com.example.fl0wer.contacts.ContactsInteractor
-import com.example.fl0wer.nullOr
 import com.example.fl0wer.mapper.ContactMapper
+import com.example.fl0wer.nullOr
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.forward
 import dagger.assisted.AssistedInject
@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import timber.log.Timber
 
+@Suppress("SwallowedException")
 class ContactListViewModel @AssistedInject constructor(
     private val contactsInteractor: ContactsInteractor,
     private val modo: Modo,

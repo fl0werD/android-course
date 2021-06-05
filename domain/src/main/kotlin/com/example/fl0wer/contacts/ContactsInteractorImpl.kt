@@ -1,12 +1,9 @@
 package com.example.fl0wer.contacts
 
 import com.example.fl0wer.Contact
-import java.util.Calendar
-import java.util.GregorianCalendar
 
 class ContactsInteractorImpl(
     private val contactsRepository: ContactsRepository,
-    private val reminderRepository: ReminderRepository,
 ) : ContactsInteractor {
     override suspend fun contacts(): List<Contact> {
         val contacts = contactsRepository.contacts()

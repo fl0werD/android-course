@@ -5,8 +5,8 @@ import com.example.fl0wer.dispatchers.DispatchersProvider
 import com.example.fl0wer.dispatchers.DispatchersProviderImpl
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Singleton
 
 @Module
 object AppModule {

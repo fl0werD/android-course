@@ -8,8 +8,8 @@ import com.example.fl0wer.contacts.ReminderInteractor
 import com.example.fl0wer.contacts.ReminderInteractorImpl
 import com.example.fl0wer.contacts.ReminderRepository
 import com.example.fl0wer.dispatchers.DispatchersProvider
-import com.example.fl0wer.repository.ContactsRepositoryImpl
-import com.example.fl0wer.repository.ReminderRepositoryImpl
+import com.example.fl0wer.data.repository.ContactsRepositoryImpl
+import com.example.fl0wer.data.repository.ReminderRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import java.util.GregorianCalendar
@@ -29,10 +29,8 @@ object DataModule {
     @[Provides Singleton]
     fun bindContactsInteractor(
         contactsRepository: ContactsRepository,
-        reminderRepository: ReminderRepository,
     ): ContactsInteractor = ContactsInteractorImpl(
         contactsRepository,
-        reminderRepository,
     )
 
     @[Provides Singleton]

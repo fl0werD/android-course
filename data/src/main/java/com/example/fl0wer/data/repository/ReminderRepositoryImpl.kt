@@ -1,4 +1,4 @@
-package com.example.fl0wer.repository
+package com.example.fl0wer.data.repository
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -7,9 +7,8 @@ import android.content.Intent
 import com.example.fl0wer.Const
 import com.example.fl0wer.Contact
 import com.example.fl0wer.contacts.ReminderRepository
-import com.example.fl0wer.dispatchers.DispatchersProvider
-import com.example.fl0wer.getAlarmManager
-import com.example.fl0wer.setTimer
+import com.example.fl0wer.data.getAlarmManager
+import com.example.fl0wer.data.setTimer
 import java.util.GregorianCalendar
 
 class ReminderRepositoryImpl(

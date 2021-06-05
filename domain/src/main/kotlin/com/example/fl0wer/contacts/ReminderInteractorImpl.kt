@@ -29,6 +29,7 @@ class ReminderInteractorImpl(
         }
     }
 
+    @Suppress("MagicNumber")
     private fun calculateNextBirthdayDate(month: Int, dayOfMonth: Int) =
         GregorianCalendar().apply {
             val currentYear = date.get(GregorianCalendar.YEAR)
