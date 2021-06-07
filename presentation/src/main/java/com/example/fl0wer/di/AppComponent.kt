@@ -2,11 +2,11 @@ package com.example.fl0wer.di
 
 import android.content.Context
 import com.example.fl0wer.ContactBroadcastReceiver
-import com.example.fl0wer.presentation.contactdetails.ContactDetailsFragment
-import com.example.fl0wer.presentation.contactlist.ContactListFragment
+import com.example.fl0wer.contactdetails.ContactDetailsFragment
+import com.example.fl0wer.contactlist.ContactListFragment
 import com.example.fl0wer.di.contactdetails.ContactDetailsScope
 import com.example.fl0wer.di.contactlist.ContactListScope
-import com.example.fl0wer.presentation.main.MainActivity
+import com.example.fl0wer.main.MainActivity
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton

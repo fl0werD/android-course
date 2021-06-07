@@ -2,13 +2,13 @@ package com.example.fl0wer
 
 import com.example.fl0wer.contacts.ReminderInteractorImpl
 import com.example.fl0wer.contacts.ReminderRepository
-import java.util.GregorianCalendar
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.mockito.kotlin.argWhere
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import java.util.GregorianCalendar
 
 class BirthdayReminderTest {
     private val reminderRepository: ReminderRepository = mock()

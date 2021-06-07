@@ -1,4 +1,4 @@
-package com.example.fl0wer.presentation.main
+package com.example.fl0wer.main
 
 import android.Manifest
 import android.content.Intent

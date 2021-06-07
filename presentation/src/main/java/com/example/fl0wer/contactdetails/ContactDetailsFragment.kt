@@ -1,4 +1,4 @@
-package com.example.fl0wer.presentation.contactdetails
+package com.example.fl0wer.contactdetails
 
 import android.content.Context
 import android.graphics.Color
@@ -17,11 +17,8 @@ import com.example.fl0wer.App
 import com.example.fl0wer.R
 import com.example.fl0wer.UiState
 import com.example.fl0wer.databinding.FragmentContactDetailsBinding
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import javax.inject.Inject
 import kotlinx.coroutines.flow.collect
+import javax.inject.Inject
 
 class ContactDetailsFragment : Fragment() {
     @Inject
@@ -48,7 +45,9 @@ class ContactDetailsFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ) = FragmentContactDetailsBinding.inflate(inflater, container, false)
         .also { binding = it }
         .root
@@ -97,7 +96,11 @@ class ContactDetailsFragment : Fragment() {
         if (contact.birthdayMonth != -1 && contact.birthdayDayOfMonth != -1) {
             birthdayTitle.isVisible = true
             birthday.isVisible = true
-            birthday.text = getString(R.string.birthday_value, contact.birthdayMonth, contact.birthdayDayOfMonth)
+            birthday.text = getString(
+                R.string.birthday_value,
+                contact.birthdayMonth,
+                contact.birthdayDayOfMonth
+            )
             birthdayNotice.isVisible = true
             if (state.birthdayReminder) {
                 birthdayNotice.setImageResource(R.drawable.ic_notifications_active)

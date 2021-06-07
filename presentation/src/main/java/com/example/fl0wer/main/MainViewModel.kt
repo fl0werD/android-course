@@ -1,4 +1,4 @@
-package com.example.fl0wer.presentation.main
+package com.example.fl0wer.main
 
 import androidx.lifecycle.ViewModel
 import com.example.fl0wer.Screens

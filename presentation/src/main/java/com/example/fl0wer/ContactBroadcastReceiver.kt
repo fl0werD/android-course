@@ -11,10 +11,10 @@ import com.example.fl0wer.Const.NOTIFICATION_CHANNEL_ID
 import com.example.fl0wer.Const.RECEIVER_INTENT_ACTION_CONTACT_BIRTHDAY
 import com.example.fl0wer.contacts.ContactsInteractor
 import com.example.fl0wer.dispatchers.DispatchersProvider
-import com.example.fl0wer.presentation.main.MainActivity
-import javax.inject.Inject
+import com.example.fl0wer.main.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class ContactBroadcastReceiver : BroadcastReceiver() {
     @Inject

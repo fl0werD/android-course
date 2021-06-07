@@ -1,7 +1,7 @@
 package com.example.fl0wer
 
-import com.example.fl0wer.presentation.contactdetails.ContactDetailsFragment
-import com.example.fl0wer.presentation.contactlist.ContactListFragment
+import com.example.fl0wer.contactdetails.ContactDetailsFragment
+import com.example.fl0wer.contactlist.ContactListFragment
 import com.github.terrakok.modo.android.AppScreen
 import kotlinx.parcelize.Parcelize
 

@@ -1,4 +1,4 @@
-package com.example.fl0wer.repository
+package com.example.fl0wer.data.repository
 
 import android.content.Context
 import android.database.Cursor
@@ -70,18 +70,30 @@ class ContactsRepositoryImpl(
             return@withContext null
         }
 
+    @Suppress("ReturnCount")
     private fun handleContact(data: Cursor): Contact? {
         val id = data.getInt(ContactsContract.Contacts._ID) ?: return null
         val lookupKey = data.getString(ContactsContract.Data.LOOKUP_KEY) ?: return null
         val name = data.getString(ContactsContract.Data.DISPLAY_NAME_PRIMARY) ?: return null
-        var phone = ""
-        var phone2 = ""
-        var email = ""
-        var email2 = ""
-        var birthdayMonth = -1
-        var birthdayDayOfMonth = -1
-        var note = ""
+        val phones = getPhones(lookupKey)
+        val emails = getEmails(lookupKey)
+        val birthday = getBirthday(lookupKey)
+        val note = getNote(lookupKey)
 
+        return Contact(
+            id,
+            lookupKey,
+            0,
+            name,
+            phones[0], phones[1],
+            emails[0], emails[1],
+            birthday[0], birthday[1],
+            note,
+        )
+    }
+
+    private fun getPhones(lookupKey: String): MutableList<String> {
+        val phones = mutableListOf("", "")
         context.contentResolver.query(
             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
             arrayOf(
@@ -94,13 +106,17 @@ class ContactsRepositoryImpl(
         )?.use {
             while (it.moveToNext()) {
                 val number = it.getString(ContactsContract.CommonDataKinds.Phone.NUMBER) ?: continue
-                when (it.getInt(it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.TYPE))) {
-                    ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE -> phone = number
-                    else -> phone2 = number
+                when (it.getInt(ContactsContract.CommonDataKinds.Phone.TYPE)) {
+                    ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE -> phones[0] = number
+                    else -> phones[1] = number
                 }
             }
         }
+        return phones
+    }
 
+    private fun getEmails(lookupKey: String): MutableList<String> {
+        val emails = mutableListOf("", "")
         context.contentResolver.query(
             ContactsContract.CommonDataKinds.Email.CONTENT_LOOKUP_URI,
             arrayOf(
@@ -113,13 +129,18 @@ class ContactsRepositoryImpl(
         )?.use {
             while (it.moveToNext()) {
                 val label = it.getString(ContactsContract.CommonDataKinds.Email.LABEL) ?: continue
-                when (it.getInt(it.getColumnIndex(ContactsContract.CommonDataKinds.Email.TYPE))) {
-                    ContactsContract.CommonDataKinds.Email.TYPE_WORK -> email = label
-                    else -> email2 = label
+                when (it.getInt(ContactsContract.CommonDataKinds.Email.TYPE)) {
+                    ContactsContract.CommonDataKinds.Email.TYPE_WORK -> emails[0] = label
+                    else -> emails[1] = label
                 }
             }
         }
+        return emails
+    }
 
+    @Suppress("NestedBlockDepth")
+    private fun getBirthday(lookupKey: String): MutableList<Int> {
+        val birthday = mutableListOf(-1, -1)
         context.contentResolver.query(
             ContactsContract.Data.CONTENT_URI,
             arrayOf(ContactsContract.CommonDataKinds.Event.START_DATE),
@@ -138,18 +159,23 @@ class ContactsRepositoryImpl(
                     it.getString(ContactsContract.CommonDataKinds.Event.START_DATE) ?: continue
                 val formatter = SimpleDateFormat("MM-dd", Locale.getDefault())
                 try {
-                    val date = formatter.parse(startDate)
-                    GregorianCalendar().apply {
-                        timeInMillis = date.time
-                        birthdayMonth = get(GregorianCalendar.MONTH)
-                        birthdayDayOfMonth = get(GregorianCalendar.DAY_OF_MONTH)
+                    formatter.parse(startDate)?.let {
+                        GregorianCalendar().apply {
+                            timeInMillis = it.time
+                            birthday[0] = get(GregorianCalendar.MONTH)
+                            birthday[1] = get(GregorianCalendar.DAY_OF_MONTH)
+                        }
                     }
                 } catch (e: ParseException) {
-                    continue
+                    return birthday
                 }
             }
         }
+        return birthday
+    }
 
+    private fun getNote(lookupKey: String): String {
+        var note = ""
         context.contentResolver.query(
             ContactsContract.Data.CONTENT_URI,
             arrayOf(ContactsContract.CommonDataKinds.Note.NOTE),
@@ -166,17 +192,7 @@ class ContactsRepositoryImpl(
                 note = notes
             }
         }
-
-        return Contact(
-            id,
-            lookupKey,
-            0,
-            name,
-            phone, phone2,
-            email, email2,
-            birthdayMonth, birthdayDayOfMonth,
-            note,
-        )
+        return note
     }
 
     private fun Cursor.getInt(column: String): Int? =

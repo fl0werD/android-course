@@ -1,4 +1,4 @@
-package com.example.fl0wer.presentation.contactlist
+package com.example.fl0wer.contactlist
 
 import android.content.Context
 import android.graphics.Canvas
@@ -47,14 +47,12 @@ fun contactItemDecorator(context: Context) = object : RecyclerView.ItemDecoratio
 }
 
 val contactDiffCallback = object : DiffUtil.ItemCallback<ContactParcelable>() {
-    override fun areItemsTheSame(oldItem: ContactParcelable, newItem: ContactParcelable): Boolean {
-        return oldItem.id == newItem.id
-    }
+    override fun areItemsTheSame(oldItem: ContactParcelable, newItem: ContactParcelable) =
+        oldItem.id == newItem.id
 
-    override fun areContentsTheSame(oldItem: ContactParcelable, newItem: ContactParcelable): Boolean {
-        return oldItem.name == newItem.name &&
-                oldItem.phone == newItem.phone
-    }
+    override fun areContentsTheSame(oldItem: ContactParcelable, newItem: ContactParcelable) =
+        oldItem.name == newItem.name &&
+            oldItem.phone == newItem.phone
 }
 
 class ContactsAdapter(

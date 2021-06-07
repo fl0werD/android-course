@@ -1,4 +1,4 @@
-package com.example.fl0wer.presentation.contactdetails
+package com.example.fl0wer.contactdetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -45,7 +45,8 @@ class ContactDetailsViewModel @AssistedInject constructor(
         vmScope.launch {
             try {
                 reminderInteractor.changeBirthdayReminder(ContactParcelableMapper.map(currentState.contact))
-                _uiState.value = currentState.copy(birthdayReminder = !currentState.birthdayReminder)
+                _uiState.value =
+                    currentState.copy(birthdayReminder = !currentState.birthdayReminder)
             } catch (e: IOException) {
                 _uiState.value = ContactDetailsState.Failure
             }

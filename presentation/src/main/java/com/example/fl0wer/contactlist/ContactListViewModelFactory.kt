@@ -1,4 +1,4 @@
-package com.example.fl0wer.presentation.contactlist
+package com.example.fl0wer.contactlist
 
 import dagger.assisted.AssistedFactory
 
