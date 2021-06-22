@@ -7,8 +7,8 @@ import android.content.Intent
 import com.example.fl0wer.androidApp.util.Const
 import com.example.fl0wer.domain.contacts.Contact
 import com.example.fl0wer.domain.contacts.ReminderRepository
-import com.example.fl0wer.androidApp.getAlarmManager
-import com.example.fl0wer.androidApp.setTimer
+import com.example.fl0wer.androidApp.util.getAlarmManager
+import com.example.fl0wer.androidApp.util.setTimer
 import java.util.GregorianCalendar
 
 class ReminderRepositoryImpl(

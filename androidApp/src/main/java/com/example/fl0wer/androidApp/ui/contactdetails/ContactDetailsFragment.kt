@@ -19,7 +19,6 @@ import com.example.fl0wer.androidApp.ui.UiState
 import com.example.fl0wer.databinding.FragmentContactDetailsBinding
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
@@ -34,6 +33,7 @@ class ContactDetailsFragment : Fragment() {
         )
     }
     private lateinit var binding: FragmentContactDetailsBinding
+    private var mapFragment: SupportMapFragment? = null
 
     companion object {
         private const val ARGUMENT_CONTACT_ID = "ARGUMENT_CONTACT_ID"
@@ -66,14 +66,10 @@ class ContactDetailsFragment : Fragment() {
                 viewModel.changeBirthdayNotice()
             }
         }
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
+        mapFragment = childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
         mapFragment?.getMapAsync {
-            it.setOnMapClickListener { latlng ->
-                it.addMarker(
-                    MarkerOptions()
-                        .position(latlng)
-                        .title("Marker")
-                )
+            it.setOnMapLongClickListener { location ->
+                viewModel.mapClicked(location)
             }
         }
         lifecycleScope.launchWhenStarted {
@@ -127,6 +123,15 @@ class ContactDetailsFragment : Fragment() {
             birthdayTitle.isVisible = false
             birthday.isVisible = false
             birthdayNotice.isVisible = false
+        }
+
+        state.location?.apply {
+            mapFragment?.getMapAsync {
+                it.addMarker(
+                    MarkerOptions()
+                        .position(LatLng(latitude, longitude))
+                )
+            }
         }
     }
 

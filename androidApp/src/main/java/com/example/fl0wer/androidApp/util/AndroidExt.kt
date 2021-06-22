@@ -1,4 +1,4 @@
-package com.example.fl0wer.androidApp
+package com.example.fl0wer.androidApp.util
 
 import android.app.AlarmManager
 import android.app.Notification

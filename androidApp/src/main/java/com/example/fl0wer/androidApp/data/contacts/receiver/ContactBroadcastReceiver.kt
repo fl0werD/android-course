@@ -14,7 +14,7 @@ import com.example.fl0wer.domain.contacts.ContactsInteractor
 import com.example.fl0wer.domain.core.dispatchers.DispatchersProvider
 import com.example.fl0wer.androidApp.di.App
 import com.example.fl0wer.androidApp.ui.main.MainActivity
-import com.example.fl0wer.androidApp.sendNotification
+import com.example.fl0wer.androidApp.util.sendNotification
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject

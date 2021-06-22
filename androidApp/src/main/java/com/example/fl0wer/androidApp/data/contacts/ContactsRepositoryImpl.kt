@@ -4,7 +4,7 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
-import com.example.fl0wer.androidApp.data.contacts.database.ContactDatabase
+import com.example.fl0wer.androidApp.data.locations.database.LocationDatabase
 import com.example.fl0wer.domain.contacts.Contact
 import com.example.fl0wer.domain.contacts.ContactsRepository
 import com.example.fl0wer.domain.core.dispatchers.DispatchersProvider
@@ -16,7 +16,6 @@ import kotlinx.coroutines.withContext
 
 class ContactsRepositoryImpl(
     private val context: Context,
-    private val contactDatabase: ContactDatabase,
     private val dispatchersProvider: DispatchersProvider,
 ) : ContactsRepository {
     private val contacts = mutableListOf<Contact>()
@@ -45,10 +44,6 @@ class ContactsRepositoryImpl(
             }
             contacts
         }
-
-    override suspend fun locations(): List<Contact> {
-        contactDatabase.contactDao().loadLocations()
-    }
 
     override suspend fun contact(lookupKey: String) =
         withContext(dispatchersProvider.default) {

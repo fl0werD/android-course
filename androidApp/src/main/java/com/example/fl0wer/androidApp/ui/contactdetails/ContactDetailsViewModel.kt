@@ -5,26 +5,32 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.fl0wer.androidApp.data.contacts.ContactMapper.toContact
 import com.example.fl0wer.androidApp.data.contacts.ContactMapper.toParcelable
+import com.example.fl0wer.androidApp.data.locations.LocationMapper.toParcelable
+import com.example.fl0wer.androidApp.data.locations.LocationParcelable
+import com.example.fl0wer.androidApp.ui.nullOr
 import com.example.fl0wer.domain.contacts.ContactsInteractor
 import com.example.fl0wer.domain.contacts.ReminderInteractor
-import com.example.fl0wer.androidApp.ui.nullOr
+import com.example.fl0wer.domain.locations.Location
+import com.example.fl0wer.domain.locations.LocationInteractor
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.back
+import com.google.android.gms.maps.model.LatLng
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import java.io.IOException
-import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import timber.log.Timber
+import java.io.IOException
+import kotlin.coroutines.cancellation.CancellationException
 
 @Suppress("SwallowedException")
 class ContactDetailsViewModel @AssistedInject constructor(
     private val contactsInteractor: ContactsInteractor,
     private val reminderInteractor: ReminderInteractor,
+    private val locationInteractor: LocationInteractor,
     private val modo: Modo,
     @Assisted contactId: String,
 ) : ViewModel() {
@@ -53,6 +59,19 @@ class ContactDetailsViewModel @AssistedInject constructor(
         }
     }
 
+    fun mapClicked(location: LatLng) {
+        val currentState = uiState.value.nullOr<ContactDetailsState.Idle>() ?: return
+        vmScope.launch {
+            locationInteractor.mapClicked(
+                Location(
+                    currentState.contact.id,
+                    location.latitude,
+                    location.longitude
+                )
+            )
+        }
+    }
+
     fun backPressed() {
         modo.back()
     }
@@ -66,6 +85,7 @@ class ContactDetailsViewModel @AssistedInject constructor(
                     _uiState.value = ContactDetailsState.Idle(
                         contact.toParcelable(),
                         reminderInteractor.birthdayReminder(contact),
+                        locationInteractor.location(contact.id)?.toParcelable(),
                     )
                 } else {
                     _uiState.value = ContactDetailsState.Failure

@@ -5,7 +5,9 @@ import androidx.room.Room
 import com.example.fl0wer.BuildConfig
 import com.example.fl0wer.androidApp.data.contacts.ContactsRepositoryImpl
 import com.example.fl0wer.androidApp.data.contacts.ReminderRepositoryImpl
-import com.example.fl0wer.androidApp.data.contacts.database.ContactDatabase
+import com.example.fl0wer.androidApp.data.locations.LocationRepositoryImpl
+import com.example.fl0wer.androidApp.data.locations.database.LocationDao
+import com.example.fl0wer.androidApp.data.locations.database.LocationDatabase
 import com.example.fl0wer.domain.contacts.ContactsInteractor
 import com.example.fl0wer.domain.contacts.ContactsInteractorImpl
 import com.example.fl0wer.domain.contacts.ContactsRepository
@@ -13,6 +15,9 @@ import com.example.fl0wer.domain.contacts.ReminderInteractor
 import com.example.fl0wer.domain.contacts.ReminderInteractorImpl
 import com.example.fl0wer.domain.contacts.ReminderRepository
 import com.example.fl0wer.domain.core.dispatchers.DispatchersProvider
+import com.example.fl0wer.domain.locations.LocationInteractor
+import com.example.fl0wer.domain.locations.LocationInteractorImpl
+import com.example.fl0wer.domain.locations.LocationRepository
 import dagger.Module
 import dagger.Provides
 import java.util.GregorianCalendar
@@ -52,11 +57,18 @@ object DataModule {
     )
 
     @[Provides Singleton]
-    fun provideContactDatabase(
-        context: Context,
-    ): ContactDatabase = Room.databaseBuilder(
-        context,
-        ContactDatabase::class.java,
-        BuildConfig.DB_NAME,
-    ).build()
+    fun bindLocationRepository(
+        locationDao: LocationDao,
+    ): LocationRepository = LocationRepositoryImpl(
+        locationDao,
+    )
+
+    @[Provides Singleton]
+    fun bindLocationInteractor(
+        locationRepository: LocationRepository,
+        dispatchersProvider: DispatchersProvider,
+    ): LocationInteractor = LocationInteractorImpl(
+        locationRepository,
+        dispatchersProvider,
+    )
 }

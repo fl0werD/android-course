@@ -2,6 +2,7 @@
     <string name="app_name">fl0wer</string>
 
     <!-- Common. -->
+    <string name="loading">Загрузка</string>
     <string name="birthday_notice">Сегодня празднует день рождения %s</string>
 
     <!-- Permission. -->

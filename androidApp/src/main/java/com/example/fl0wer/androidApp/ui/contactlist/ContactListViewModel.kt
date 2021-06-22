@@ -89,7 +89,7 @@ class ContactListViewModel @AssistedInject constructor(
     private fun List<Contact>.toListItems() = map {
         ContactListItem(
             it.toParcelable(),
-            false
+            false,
         )
     }
 

@@ -1,11 +1,11 @@
-package com.example.fl0wer.androidApp.data.contacts.database
+package com.example.fl0wer.androidApp.data.locations.database
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "contacts")
-data class ContactEntity(
+data class LocationEntity(
     @PrimaryKey
     @ColumnInfo(name = "id")
     val id: Int,

@@ -3,9 +3,11 @@ package com.example.fl0wer.androidApp.ui.contactlocations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.fl0wer.androidApp.data.locations.LocationMapper.toParcelable
 import com.example.fl0wer.androidApp.ui.contactlist.ContactListState
 import com.example.fl0wer.androidApp.ui.contactlist.ContactListViewModelFactory
 import com.example.fl0wer.domain.contacts.ContactsInteractor
+import com.example.fl0wer.domain.locations.LocationInteractor
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.back
 import dagger.assisted.AssistedInject
@@ -19,7 +21,7 @@ import kotlinx.coroutines.plus
 import timber.log.Timber
 
 class ContactLocationsViewModel @AssistedInject constructor(
-    private val contactsInteractor: ContactsInteractor,
+    private val locationInteractor: LocationInteractor,
     private val modo: Modo,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<ContactLocationsState>(ContactLocationsState.Loading)
@@ -31,21 +33,20 @@ class ContactLocationsViewModel @AssistedInject constructor(
     }
 
     init {
-        getAllLocations()
+        loadLocations()
     }
 
     fun backPressed() {
         modo.back()
     }
 
-    private fun getAllLocations() {
+    private fun loadLocations() {
         vmScope.launch {
-            _uiState.value = ContactLocationsState.Loading
             try {
-                val locations = contactsInteractor.locations()
-                _uiState.value = ContactLocationsState.Idle(locations)
+                val locations = locationInteractor.locations()
+                _uiState.value = ContactLocationsState.Idle(locations.toParcelable())
             } catch (e: IOException) {
-                _uiState.value = ContactLocationsState.Failure
+                //_uiState.value = ContactLocationsState.Failure
             }
         }
     }

@@ -25,8 +25,4 @@ class ContactsInteractorImpl(
             contactsRepository.contacts()
         }
     }
-
-    override suspend fun locations(): List<Contact> {
-        contactsRepository.locations()
-    }
 }

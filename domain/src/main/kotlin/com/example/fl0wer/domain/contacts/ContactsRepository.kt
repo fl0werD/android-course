@@ -4,5 +4,4 @@ interface ContactsRepository {
     fun contacts(): List<Contact>
     suspend fun contact(lookupKey: String): Contact?
     suspend fun loadContacts(): List<Contact>
-    suspend fun locations(): List<Contact>
 }
