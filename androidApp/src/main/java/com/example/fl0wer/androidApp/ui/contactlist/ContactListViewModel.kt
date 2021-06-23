@@ -10,6 +10,7 @@ import com.example.fl0wer.androidApp.ui.core.navigation.Screens
 import com.example.fl0wer.androidApp.ui.nullOr
 import com.example.fl0wer.domain.contacts.Contact
 import com.example.fl0wer.domain.contacts.ContactsInteractor
+import com.example.fl0wer.domain.directions.DirectionInteractor
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.forward
 import dagger.assisted.AssistedInject
@@ -48,6 +49,11 @@ class ContactListViewModel @AssistedInject constructor(
     fun contactPinsClicked() {
         uiState.value.nullOr<ContactListState.Idle>() ?: return
         modo.forward(Screens.ContactLocations())
+    }
+
+    fun routesClicked() {
+        uiState.value.nullOr<ContactListState.Idle>() ?: return
+        modo.forward(Screens.ContactsRoute(123, 124))
     }
 
     fun contactStateChanged(position: Int) {

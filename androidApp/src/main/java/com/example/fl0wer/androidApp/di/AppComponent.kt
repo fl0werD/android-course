@@ -7,7 +7,9 @@ import com.example.fl0wer.androidApp.ui.contactlist.ContactListFragment
 import com.example.fl0wer.androidApp.di.contactdetails.ContactDetailsScope
 import com.example.fl0wer.androidApp.di.contactlist.ContactListScope
 import com.example.fl0wer.androidApp.di.contactlocations.ContactLocationsScope
+import com.example.fl0wer.androidApp.di.contactsroute.ContactsRouteScope
 import com.example.fl0wer.androidApp.ui.contactlocations.ContactLocationsFragment
+import com.example.fl0wer.androidApp.ui.contactsroute.ContactsRouteFragment
 import com.example.fl0wer.androidApp.ui.main.MainActivity
 import dagger.BindsInstance
 import dagger.Component
@@ -41,4 +43,7 @@ interface AppComponent {
 
     @ContactLocationsScope
     fun inject(contactLocationsFragment: ContactLocationsFragment)
+
+    @ContactsRouteScope
+    fun inject(contactsRouteFragment: ContactsRouteFragment)
 }

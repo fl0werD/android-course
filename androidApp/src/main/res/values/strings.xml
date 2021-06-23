@@ -27,4 +27,8 @@
     <!-- Contact Locations. -->
     <string name="contacts_selected">%d/%d выбрано</string>
     <string name="contacts_locations">Местопложение контактов</string>
+
+    <!-- Contacts Direction. -->
+    <string name="route">Маршрут</string>
+    <string name="route_not_found">Не удалось проложить маршрут</string>
 </resources>

@@ -12,7 +12,7 @@ interface LocationDao {
     fun loadLocations(): List<LocationEntity>
 
     @Query("SELECT * FROM contacts WHERE id = :id LIMIT 1")
-    fun loadLocation(id: Int): LocationEntity
+    fun loadLocation(id: Int): LocationEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(locationEntity: LocationEntity)

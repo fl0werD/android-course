@@ -6,11 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.fl0wer.androidApp.data.contacts.ContactMapper.toContact
 import com.example.fl0wer.androidApp.data.contacts.ContactMapper.toParcelable
 import com.example.fl0wer.androidApp.data.locations.LocationMapper.toParcelable
-import com.example.fl0wer.androidApp.data.locations.LocationParcelable
 import com.example.fl0wer.androidApp.ui.nullOr
 import com.example.fl0wer.domain.contacts.ContactsInteractor
 import com.example.fl0wer.domain.contacts.ReminderInteractor
-import com.example.fl0wer.domain.locations.Location
 import com.example.fl0wer.domain.locations.LocationInteractor
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.back
@@ -63,11 +61,9 @@ class ContactDetailsViewModel @AssistedInject constructor(
         val currentState = uiState.value.nullOr<ContactDetailsState.Idle>() ?: return
         vmScope.launch {
             locationInteractor.mapClicked(
-                Location(
-                    currentState.contact.id,
-                    location.latitude,
-                    location.longitude
-                )
+                currentState.contact.id,
+                location.latitude,
+                location.longitude,
             )
         }
     }

@@ -17,9 +17,11 @@ import com.example.fl0wer.R
 import com.example.fl0wer.androidApp.di.App
 import com.example.fl0wer.androidApp.ui.UiState
 import com.example.fl0wer.databinding.FragmentContactDetailsBinding
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.maps.android.ktx.addMarker
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
@@ -127,10 +129,11 @@ class ContactDetailsFragment : Fragment() {
 
         state.location?.apply {
             mapFragment?.getMapAsync {
-                it.addMarker(
-                    MarkerOptions()
-                        .position(LatLng(latitude, longitude))
-                )
+                val location = LatLng(latitude, longitude)
+                it.addMarker {
+                    position(location)
+                }
+                it.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 10F))
             }
         }
     }

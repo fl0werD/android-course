@@ -23,8 +23,8 @@ android {
         buildConfigField("int", "DB_VERSION", "1")
         buildConfigField(
             "String",
-            "GEOCODING_URL",
-            "\"https://maps.googleapis.com/maps/api/geocode/\""
+            "GOOGLE_API_BASE_URL",
+            "\"https://maps.googleapis.com/maps/api/\""
         )
     }
 
@@ -74,6 +74,7 @@ dependencies {
     implementation("com.google.android.material:material:$materialVersion")
     implementation("com.google.android.gms:play-services-location:$playServicesVersion")
     implementation("com.google.maps.android:maps-ktx:$mapsVersion")
+    implementation("com.google.maps.android:maps-utils-ktx:$mapsVersion")
 
     implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
     implementation("com.squareup.retrofit2:converter-gson:$retrofitVersion")

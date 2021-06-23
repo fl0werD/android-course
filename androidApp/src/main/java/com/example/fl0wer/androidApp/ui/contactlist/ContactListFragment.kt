@@ -73,8 +73,13 @@ class ContactListFragment : Fragment() {
             adapter = contactsAdapter
             addItemDecoration(contactItemDecorator(context))
         }
-        binding.showAllPins.setOnClickListener {
-            viewModel.contactPinsClicked()
+        with(binding) {
+            showAllPins.setOnClickListener {
+                viewModel.contactPinsClicked()
+            }
+            routes.setOnClickListener {
+                viewModel.routesClicked()
+            }
         }
         lifecycleScope.launchWhenStarted {
             viewModel.uiState.collect {
@@ -95,18 +100,21 @@ class ContactListFragment : Fragment() {
         contactsAdapter.items = state.contacts
         loadingBar.isVisible = false
         contactsList.isVisible = true
+        routes.isVisible = true
         showAllPins.isVisible = true
     }
 
     private fun drawLoadingState() = with(binding) {
         loadingBar.isVisible = true
         contactsList.isVisible = false
+        routes.isVisible = false
         showAllPins.isVisible = false
     }
 
     private fun drawFailureState() = with(binding) {
         loadingBar.isVisible = false
         contactsList.isVisible = true
+        routes.isVisible = false
         showAllPins.isVisible = false
     }
 }

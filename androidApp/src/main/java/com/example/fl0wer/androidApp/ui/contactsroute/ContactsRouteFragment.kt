@@ -1,39 +1,54 @@
-package com.example.fl0wer.androidApp.ui.contactlocations
+package com.example.fl0wer.androidApp.ui.contactsroute
 
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.fl0wer.R
-import com.example.fl0wer.androidApp.data.locations.LocationParcelable
+import com.example.fl0wer.androidApp.data.directions.DirectionParcelable
 import com.example.fl0wer.androidApp.di.App
 import com.example.fl0wer.androidApp.ui.UiState
+import com.example.fl0wer.androidApp.ui.contactdetails.ContactDetailsFragment
 import com.example.fl0wer.databinding.FragmentContactLocationsBinding
+import com.example.fl0wer.databinding.FragmentContactsRouteBinding
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.maps.android.ktx.addMarker
+import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.flow.collect
+import timber.log.Timber
 import javax.inject.Inject
 
-class ContactLocationsFragment : Fragment() {
+class ContactsRouteFragment : Fragment() {
     @Inject
-    lateinit var viewModelFactory: ContactLocationsViewModelFactory
-    private val viewModel: ContactLocationsViewModel by viewModels {
-        ContactLocationsViewModel.provideFactory(viewModelFactory)
+    lateinit var viewModelFactory: ContactsRouteViewModelFactory
+    private val viewModel: ContactsRouteViewModel by viewModels {
+        ContactsRouteViewModel.provideFactory(
+            viewModelFactory,
+            arguments?.getInt(ARGUMENT_START_CONTACT_ID, -1) ?: -1,
+            arguments?.getInt(ARGUMENT_END_CONTACT_ID, -1) ?: -1,
+        )
     }
-    private lateinit var binding: FragmentContactLocationsBinding
+    private lateinit var binding: FragmentContactsRouteBinding
     private var mapFragment: SupportMapFragment? = null
 
     companion object {
-        fun newInstance() = ContactLocationsFragment()
+        private const val ARGUMENT_START_CONTACT_ID = "ARGUMENT_START_CONTACT_ID"
+        private const val ARGUMENT_END_CONTACT_ID = "ARGUMENT_END_CONTACT_ID"
+
+        fun newInstance(startContactId: Int, endContactId: Int) = ContactsRouteFragment().apply {
+            arguments = bundleOf(
+                ARGUMENT_START_CONTACT_ID to startContactId,
+                ARGUMENT_END_CONTACT_ID to endContactId,
+            )
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -45,7 +60,7 @@ class ContactLocationsFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ) = FragmentContactLocationsBinding.inflate(inflater, container, false)
+    ) = FragmentContactsRouteBinding.inflate(inflater, container, false)
         .also { binding = it }
         .root
 
@@ -66,8 +81,9 @@ class ContactLocationsFragment : Fragment() {
 
     private fun updateState(state: UiState) {
         when (state) {
-            is ContactLocationsState.Loading -> drawLoadingState()
-            is ContactLocationsState.Idle -> drawIdleState(state)
+            is ContactsRouteState.Loading -> drawLoadingState()
+            is ContactsRouteState.Idle -> drawIdleState(state)
+            is ContactsRouteState.RouteNotFound -> drawRouteNotFound()
         }
     }
 
@@ -75,25 +91,14 @@ class ContactLocationsFragment : Fragment() {
         toolbar.title = getString(R.string.loading)
     }
 
-    private fun drawIdleState(state: ContactLocationsState.Idle) = with(binding) {
-        toolbar.title = getString(R.string.contacts_locations)
+    private fun drawIdleState(state: ContactsRouteState.Idle) = with(binding) {
+        toolbar.title = getString(R.string.route)
         mapFragment?.getMapAsync {
-            it.showMarkers(state.locations)
+            it.addPolyline(PolylineOptions().addAll(state.route))
         }
     }
 
-    private fun GoogleMap.showMarkers(locations: List<LocationParcelable>) {
-        if (locations.isEmpty()) {
-            return
-        }
-        val boundsBuilder = LatLngBounds.Builder()
-        locations.forEach {
-            val latLng = LatLng(it.latitude, it.longitude)
-            boundsBuilder.include(latLng)
-            addMarker {
-                position(latLng)
-            }
-        }
-        moveCamera(CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 100))
+    private fun drawRouteNotFound() = with(binding) {
+        toolbar.title = getString(R.string.route_not_found)
     }
 }
