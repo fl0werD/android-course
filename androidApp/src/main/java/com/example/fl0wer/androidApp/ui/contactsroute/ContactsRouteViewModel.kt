@@ -3,10 +3,9 @@ package com.example.fl0wer.androidApp.ui.contactsroute
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.fl0wer.androidApp.data.contacts.ContactParcelable
-import com.example.fl0wer.androidApp.data.directions.DirectionMapper.toParcelable
-import com.example.fl0wer.androidApp.data.locations.LocationParcelable
+import com.example.fl0wer.androidApp.data.directions.toParcelable
 import com.example.fl0wer.domain.directions.DirectionInteractor
+import com.example.fl0wer.domain.locations.LocationInteractor
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.back
 import dagger.assisted.Assisted
@@ -21,6 +20,7 @@ import timber.log.Timber
 import java.io.IOException
 
 class ContactsRouteViewModel @AssistedInject constructor(
+    private val locationInteractor: LocationInteractor,
     private val directionInteractor: DirectionInteractor,
     private val modo: Modo,
     @Assisted("startContact") private val startContactId: Int,
@@ -46,17 +46,20 @@ class ContactsRouteViewModel @AssistedInject constructor(
         vmScope.launch {
             _uiState.value = ContactsRouteState.Loading
             try {
-                val direction = directionInteractor.route(
-                    "H08, Kirovohrads'ka oblast, Ukraine",
-                    "Unnamed Road, Hel'myaziv, Cherkas'ka oblast, Ukraine, 19715",
-                )
-                if (direction != null) {
-                    _uiState.value = ContactsRouteState.Idle(emptyList()/*direction.toParcelable()*/)
+                /*val start = locationInteractor.location(startContactId)
+                val end = locationInteractor.location(endContactId)
+                if (start != null && end != null) {
+                    val route = directionInteractor.route(start.address, end.address)
+                    if (route != null) {
+                        _uiState.value = ContactsRouteState.Idle(route.toParcelable())
+                    } else {
+                        _uiState.value = ContactsRouteState.RouteNotFound
+                    }
                 } else {
-                    _uiState.value = ContactsRouteState.RouteNotFound
-                }
+                    _uiState.value = ContactsRouteState.EmptyAddress
+                }*/
             } catch (e: IOException) {
-                //_uiState.value = ContactsRouteState.Failure
+                Timber.e(e)
             }
         }
     }

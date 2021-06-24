@@ -20,6 +20,7 @@ import com.example.fl0wer.databinding.FragmentContactDetailsBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.ktx.addMarker
 import kotlinx.coroutines.flow.collect
@@ -36,6 +37,7 @@ class ContactDetailsFragment : Fragment() {
     }
     private lateinit var binding: FragmentContactDetailsBinding
     private var mapFragment: SupportMapFragment? = null
+    private var mapMarker: Marker? = null
 
     companion object {
         private const val ARGUMENT_CONTACT_ID = "ARGUMENT_CONTACT_ID"
@@ -129,11 +131,10 @@ class ContactDetailsFragment : Fragment() {
 
         state.location?.apply {
             mapFragment?.getMapAsync {
-                val location = LatLng(latitude, longitude)
-                it.addMarker {
-                    position(location)
+                mapMarker?.remove()
+                mapMarker = it.addMarker {
+                    position(LatLng(latitude, longitude))
                 }
-                it.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 10F))
             }
         }
     }

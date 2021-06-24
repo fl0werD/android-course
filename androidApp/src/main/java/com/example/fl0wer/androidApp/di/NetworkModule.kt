@@ -1,9 +1,8 @@
 package com.example.fl0wer.androidApp.di
 
 import com.example.fl0wer.BuildConfig
+import com.example.fl0wer.androidApp.data.core.network.GoogleApi
 import com.example.fl0wer.androidApp.data.core.network.RequestInterceptor
-import com.example.fl0wer.androidApp.data.directions.network.DirectionsApi
-import com.example.fl0wer.androidApp.data.locations.network.GeocodeApi
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -28,21 +27,10 @@ class NetworkModule {
     fun provideGeocodeApi(
         okHttpClient: OkHttpClient,
         gson: Gson,
-    ): GeocodeApi = Retrofit.Builder()
-        .baseUrl(BuildConfig.GOOGLE_API_BASE_URL + "geocode/")
+    ): GoogleApi = Retrofit.Builder()
+        .baseUrl(BuildConfig.GOOGLE_API_BASE_URL)
         .client(okHttpClient)
         .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
-        .create(GeocodeApi::class.java)
-
-    @[Provides Singleton]
-    fun provideDirectionsApi(
-        okHttpClient: OkHttpClient,
-        gson: Gson,
-    ): DirectionsApi = Retrofit.Builder()
-        .baseUrl(BuildConfig.GOOGLE_API_BASE_URL + "directions/")
-        .client(okHttpClient)
-        .addConverterFactory(GsonConverterFactory.create(gson))
-        .build()
-        .create(DirectionsApi::class.java)
+        .create(GoogleApi::class.java)
 }

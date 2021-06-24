@@ -3,11 +3,10 @@ package com.example.fl0wer.androidApp.di
 import android.content.Context
 import com.example.fl0wer.androidApp.data.contacts.ContactsRepositoryImpl
 import com.example.fl0wer.androidApp.data.contacts.ReminderRepositoryImpl
+import com.example.fl0wer.androidApp.data.core.network.GoogleApi
 import com.example.fl0wer.androidApp.data.directions.DirectionRepositoryImpl
-import com.example.fl0wer.androidApp.data.directions.network.DirectionsApi
 import com.example.fl0wer.androidApp.data.locations.LocationRepositoryImpl
 import com.example.fl0wer.androidApp.data.locations.database.LocationDao
-import com.example.fl0wer.androidApp.data.locations.network.GeocodeApi
 import com.example.fl0wer.domain.contacts.*
 import com.example.fl0wer.domain.core.dispatchers.DispatchersProvider
 import com.example.fl0wer.domain.directions.DirectionInteractor
@@ -57,10 +56,10 @@ object DataModule {
     @[Provides Singleton]
     fun bindLocationRepository(
         locationDao: LocationDao,
-        geocodeApi: GeocodeApi,
+        googleApi: GoogleApi,
     ): LocationRepository = LocationRepositoryImpl(
         locationDao,
-        geocodeApi,
+        googleApi,
     )
 
     @[Provides Singleton]
@@ -72,12 +71,11 @@ object DataModule {
         dispatchersProvider,
     )
 
-
     @[Provides Singleton]
     fun bindDirectionRepository(
-        directionsApi: DirectionsApi,
+        googleApi: GoogleApi,
     ): DirectionRepository = DirectionRepositoryImpl(
-        directionsApi,
+        googleApi,
     )
 
     @[Provides Singleton]

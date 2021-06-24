@@ -4,5 +4,5 @@ import dagger.assisted.AssistedFactory
 
 @AssistedFactory
 interface ContactDetailsViewModelFactory {
-    fun create(contactId: String): ContactDetailsViewModel
+    fun create(contactLookupKey: String): ContactDetailsViewModel
 }

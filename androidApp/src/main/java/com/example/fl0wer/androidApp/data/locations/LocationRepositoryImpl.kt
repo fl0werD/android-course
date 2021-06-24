@@ -1,23 +1,29 @@
 package com.example.fl0wer.androidApp.data.locations
 
-import com.example.fl0wer.BuildConfig
+import com.example.fl0wer.androidApp.data.core.network.GoogleApi
 import com.example.fl0wer.androidApp.data.locations.LocationMapper.toEntity
 import com.example.fl0wer.androidApp.data.locations.LocationMapper.toLocation
 import com.example.fl0wer.androidApp.data.locations.database.LocationDao
-import com.example.fl0wer.androidApp.data.locations.database.LocationDatabase
-import com.example.fl0wer.androidApp.data.locations.network.GeocodeApi
-import com.example.fl0wer.domain.contacts.Contact
 import com.example.fl0wer.domain.locations.Location
 import com.example.fl0wer.domain.locations.LocationRepository
-import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class LocationRepositoryImpl(
     private val locationDao: LocationDao,
-    private val geocodeApi: GeocodeApi,
+    private val googleApi: GoogleApi,
 ) : LocationRepository {
-    override suspend fun location(contactId: Int): Location? {
-        return locationDao.loadLocation(contactId)?.toLocation()
+    override fun observeLocation(contactId: Int): Flow<Location?> {
+        return locationDao.loadLocation(contactId).map {
+            it?.toLocation()
+        }
     }
+
+    /*override suspend fun location(contactId: Int): Location? {
+        return locationDao.loadLocation(contactId).map {
+            it?.toLocation()
+        }
+    }*/
 
     override suspend fun locations(): List<Location> {
         return locationDao.loadLocations().toLocation()
@@ -27,12 +33,12 @@ class LocationRepositoryImpl(
         locationDao.insert(location.toEntity())
     }
 
-    override suspend fun reverseGeocode(latitude: Double, longitude: Double): String {
-        val response = geocodeApi.reverseGeocode("$latitude,$longitude")
-        if (response.status == "OK") {
-            return response.results[0].address
+    override suspend fun reverseGeocode(latitude: Double, longitude: Double): String? {
+        val response = googleApi.reverseGeocode("$latitude,$longitude")
+        return if (response.status == "OK") {
+            response.results[0].address
         } else {
-            return ""
+            null
         }
     }
 }

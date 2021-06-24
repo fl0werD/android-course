@@ -9,6 +9,7 @@ import com.example.fl0wer.androidApp.data.locations.LocationMapper.toParcelable
 import com.example.fl0wer.androidApp.ui.nullOr
 import com.example.fl0wer.domain.contacts.ContactsInteractor
 import com.example.fl0wer.domain.contacts.ReminderInteractor
+import com.example.fl0wer.domain.core.dispatchers.DispatchersProvider
 import com.example.fl0wer.domain.locations.LocationInteractor
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.back
@@ -16,8 +17,7 @@ import com.google.android.gms.maps.model.LatLng
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import timber.log.Timber
@@ -29,8 +29,9 @@ class ContactDetailsViewModel @AssistedInject constructor(
     private val contactsInteractor: ContactsInteractor,
     private val reminderInteractor: ReminderInteractor,
     private val locationInteractor: LocationInteractor,
+    private val dispatchersProvider: DispatchersProvider,
     private val modo: Modo,
-    @Assisted contactId: String,
+    @Assisted contactLookupKey: String,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<ContactDetailsState>(ContactDetailsState.Loading)
     val uiState: StateFlow<ContactDetailsState> get() = _uiState
@@ -39,9 +40,11 @@ class ContactDetailsViewModel @AssistedInject constructor(
             Timber.e(e)
         }
     }
+    private val contactId = MutableStateFlow(0)
 
     init {
-        getContactById(contactId)
+        loadContact(contactLookupKey)
+        subscribeLocation()
     }
 
     fun changeBirthdayNotice() {
@@ -72,7 +75,7 @@ class ContactDetailsViewModel @AssistedInject constructor(
         modo.back()
     }
 
-    private fun getContactById(lookupKey: String) {
+    private fun loadContact(lookupKey: String) {
         vmScope.launch {
             _uiState.value = ContactDetailsState.Loading
             try {
@@ -81,7 +84,6 @@ class ContactDetailsViewModel @AssistedInject constructor(
                     _uiState.value = ContactDetailsState.Idle(
                         contact.toParcelable(),
                         reminderInteractor.birthdayReminder(contact),
-                        locationInteractor.location(contact.id)?.toParcelable(),
                     )
                 } else {
                     _uiState.value = ContactDetailsState.Failure
@@ -92,14 +94,32 @@ class ContactDetailsViewModel @AssistedInject constructor(
         }
     }
 
+    private fun subscribeLocation() = vmScope.launch {
+        locationInteractor.observeLocation(1)
+            .map {
+                val currentState = uiState.value
+                if (currentState is ContactDetailsState.Idle) {
+                    currentState.copy(
+                       location = it?.toParcelable()
+                   )
+                } else {
+                    currentState
+                }
+            }
+            .flowOn(dispatchersProvider.io)
+            .collect { newState ->
+                _uiState.value = newState
+            }
+    }
+
     companion object {
         fun provideFactory(
             assistedFactory: ContactDetailsViewModelFactory,
-            contactId: String,
+            contactLookupKey: String,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return assistedFactory.create(contactId) as T
+                return assistedFactory.create(contactLookupKey) as T
             }
         }
     }

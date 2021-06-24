@@ -1,10 +1,7 @@
 package com.example.fl0wer.androidApp.ui.contactsroute
 
-import com.example.fl0wer.androidApp.data.directions.DirectionParcelable
-import com.example.fl0wer.androidApp.data.locations.LocationParcelable
+import com.example.fl0wer.androidApp.data.directions.RouteParcelable
 import com.example.fl0wer.androidApp.ui.UiState
-import com.example.fl0wer.domain.directions.Direction
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.parcelize.Parcelize
 
 sealed class ContactsRouteState : UiState {
@@ -13,8 +10,11 @@ sealed class ContactsRouteState : UiState {
 
     @Parcelize
     data class Idle(
-        val route: List<LatLng>,
+        val route: RouteParcelable,
     ) : ContactsRouteState()
+
+    @Parcelize
+    object EmptyAddress : ContactsRouteState()
 
     @Parcelize
     object RouteNotFound : ContactsRouteState()

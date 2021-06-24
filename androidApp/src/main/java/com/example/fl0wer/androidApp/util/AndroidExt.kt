@@ -11,6 +11,10 @@ import android.os.Build
 import androidx.core.app.NotificationManagerCompat
 import com.example.fl0wer.androidApp.util.Const.NOTIFICATION_CHANNEL_ID
 import com.example.fl0wer.R
+import com.example.fl0wer.androidApp.data.directions.LatLonParcelable
+import com.google.android.gms.maps.model.LatLng
+
+fun LatLonParcelable.toLatLng() = LatLng(latitude, longitude)
 
 fun getAlarmManager(context: Context): AlarmManager? =
     (context.getSystemService(Context.ALARM_SERVICE) as AlarmManager?)

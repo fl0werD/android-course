@@ -53,7 +53,7 @@ class ContactListViewModel @AssistedInject constructor(
 
     fun routesClicked() {
         uiState.value.nullOr<ContactListState.Idle>() ?: return
-        modo.forward(Screens.ContactsRoute(123, 124))
+        modo.forward(Screens.ContactsRoute(1, 5))
     }
 
     fun contactStateChanged(position: Int) {

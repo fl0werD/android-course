@@ -10,20 +10,17 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.fl0wer.R
-import com.example.fl0wer.androidApp.data.directions.DirectionParcelable
+import com.example.fl0wer.androidApp.data.directions.BoundsParcelable
 import com.example.fl0wer.androidApp.di.App
 import com.example.fl0wer.androidApp.ui.UiState
-import com.example.fl0wer.androidApp.ui.contactdetails.ContactDetailsFragment
-import com.example.fl0wer.databinding.FragmentContactLocationsBinding
+import com.example.fl0wer.androidApp.util.toLatLng
 import com.example.fl0wer.databinding.FragmentContactsRouteBinding
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.flow.collect
-import timber.log.Timber
 import javax.inject.Inject
 
 class ContactsRouteFragment : Fragment() {
@@ -83,7 +80,8 @@ class ContactsRouteFragment : Fragment() {
         when (state) {
             is ContactsRouteState.Loading -> drawLoadingState()
             is ContactsRouteState.Idle -> drawIdleState(state)
-            is ContactsRouteState.RouteNotFound -> drawRouteNotFound()
+            is ContactsRouteState.EmptyAddress -> drawEmptyAddressState()
+            is ContactsRouteState.RouteNotFound -> drawRouteNotFoundState()
         }
     }
 
@@ -93,12 +91,28 @@ class ContactsRouteFragment : Fragment() {
 
     private fun drawIdleState(state: ContactsRouteState.Idle) = with(binding) {
         toolbar.title = getString(R.string.route)
-        mapFragment?.getMapAsync {
-            it.addPolyline(PolylineOptions().addAll(state.route))
+        mapFragment?.getMapAsync { map ->
+            map.addPolyline(
+                PolylineOptions()
+                    .addAll(state.route.points.map { it.toLatLng() })
+            )
+            map.animateCameraToBounds(state.route.bounds)
         }
     }
 
-    private fun drawRouteNotFound() = with(binding) {
+    private fun drawRouteNotFoundState() = with(binding) {
         toolbar.title = getString(R.string.route_not_found)
+    }
+
+    private fun drawEmptyAddressState() = with(binding) {
+        toolbar.title = "Address not found"
+    }
+
+    private fun GoogleMap.animateCameraToBounds(bounds: BoundsParcelable) {
+        val locationBounds = LatLngBounds.Builder()
+            .include(bounds.northeast.toLatLng())
+            .include(bounds.southwest.toLatLng())
+            .build()
+        animateCamera(CameraUpdateFactory.newLatLngBounds(locationBounds, 100))
     }
 }
