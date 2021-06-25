@@ -24,6 +24,7 @@ class ContactsRepositoryImpl(
 
     override suspend fun loadContacts() =
         withContext(dispatchersProvider.default) {
+            contacts.clear()
             context.contentResolver.query(
                 ContactsContract.Contacts.CONTENT_URI,
                 arrayOf(

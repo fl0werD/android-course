@@ -1,10 +1,12 @@
 package com.example.fl0wer.androidApp.data.directions
 
 import com.example.fl0wer.androidApp.data.core.network.GoogleApi
+import com.example.fl0wer.domain.core.Result
 import com.example.fl0wer.domain.directions.DirectionRepository
 import com.example.fl0wer.domain.directions.Route
 import com.example.fl0wer.domain.locations.LatLon
 import com.google.maps.android.PolyUtil
+import java.io.IOException
 
 class DirectionRepositoryImpl(
     private val googleApi: GoogleApi,
@@ -12,12 +14,15 @@ class DirectionRepositoryImpl(
     override suspend fun getRoute(
         origin: String,
         destination: String,
-    ): Route? {
+    ): Result<Route> {
         val response = googleApi.getRoute(origin, destination)
         if (response.status != "OK") {
-            return null
+            return Result.Failure(IOException("Status not OK"))
         }
-        val route = response.routes.firstOrNull() ?: return null
+        val route = response.routes.firstOrNull()
+        if (route == null) {
+            return Result.Failure(IOException("No routes"))
+        }
         val points = response.routes
             .firstOrNull()
             ?.legs
@@ -29,10 +34,12 @@ class DirectionRepositoryImpl(
                         LatLon(it.latitude, it.longitude)
                     }
                 )
-            } ?: return null
-        return Route(
-            route.bounds.toBound(),
-            points,
+            }
+        if (points == null) {
+            return Result.Failure(IOException("No points"))
+        }
+        return Result.Success(
+            Route(route.bounds.toBound(), points)
         )
     }
 }

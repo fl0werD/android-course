@@ -7,22 +7,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.RelativeLayout
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.fl0wer.R
+import com.example.fl0wer.androidApp.data.contacts.ContactParcelable
 import com.example.fl0wer.androidApp.di.App
 import com.example.fl0wer.androidApp.ui.UiState
 import com.example.fl0wer.databinding.FragmentContactDetailsBinding
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.maps.android.ktx.addMarker
+import com.example.fl0wer.databinding.IncludeContactDetailBinding
+import com.example.fl0wer.databinding.IncludeContactDetailMultilineBinding
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
@@ -36,8 +36,6 @@ class ContactDetailsFragment : Fragment() {
         )
     }
     private lateinit var binding: FragmentContactDetailsBinding
-    private var mapFragment: SupportMapFragment? = null
-    private var mapMarker: Marker? = null
 
     companion object {
         private const val ARGUMENT_CONTACT_ID = "ARGUMENT_CONTACT_ID"
@@ -66,14 +64,11 @@ class ContactDetailsFragment : Fragment() {
             toolbar.setNavigationOnClickListener {
                 viewModel.backPressed()
             }
-            birthdayNotice.setOnClickListener {
-                viewModel.changeBirthdayNotice()
+            birthdayReminder.setOnClickListener {
+                viewModel.changeBirthdayReminder()
             }
-        }
-        mapFragment = childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
-        mapFragment?.getMapAsync {
-            it.setOnMapLongClickListener { location ->
-                viewModel.mapClicked(location)
+            address.root.setOnClickListener {
+                viewModel.addressClicked()
             }
         }
         lifecycleScope.launchWhenStarted {
@@ -93,70 +88,89 @@ class ContactDetailsFragment : Fragment() {
 
     private fun drawIdleState(state: ContactDetailsState.Idle) = with(binding) {
         val contact = state.contact
+        val addressValue = state.location?.address ?: getString(R.string.not_specified)
         loadingBar.isVisible = false
         scrollView.isVisible = true
+        toolbar.title = contact.name
         if (contact.photo == 0) {
             photo.setImageResource(R.drawable.ic_contact)
         } else {
             photo.setImageResource(contact.photo)
         }
         name.text = contact.name
-        phone.putText(phoneTitle, contact.phone)
-        phone2.putText(phone2Title, contact.phone2)
-        email.putText(emailTitle, contact.email)
-        email2.putText(email2Title, contact.email2)
-        note.putText(noteTitle, contact.note)
-
-        if (contact.birthdayMonth != -1 && contact.birthdayDayOfMonth != -1) {
-            birthdayTitle.isVisible = true
-            birthday.isVisible = true
-            birthday.text = getString(
-                R.string.birthday_value,
-                contact.birthdayMonth,
-                contact.birthdayDayOfMonth
-            )
-            birthdayNotice.isVisible = true
-            if (state.birthdayReminder) {
-                birthdayNotice.setImageResource(R.drawable.ic_notifications_active)
-                birthdayNotice.setColorFilter(R.color.teal_500, PorterDuff.Mode.SRC_IN)
-            } else {
-                birthdayNotice.setImageResource(R.drawable.ic_notifications_none)
-                birthdayNotice.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN)
-            }
-        } else {
-            birthdayTitle.isVisible = false
-            birthday.isVisible = false
-            birthdayNotice.isVisible = false
-        }
-
-        state.location?.apply {
-            mapFragment?.getMapAsync {
-                mapMarker?.remove()
-                mapMarker = it.addMarker {
-                    position(LatLng(latitude, longitude))
-                }
-            }
-        }
+        phone.putDetail(contact.phone, R.string.phone_main, R.drawable.ic_phone)
+        phone2.putDetail(contact.phone2, R.string.phone_mobile, R.drawable.ic_phone)
+        email.putDetail(contact.email, R.string.email_main, R.drawable.ic_email)
+        email2.putDetail(contact.email2, R.string.email_secondary, R.drawable.ic_email)
+        note.putDetail(contact.note, R.drawable.ic_note)
+        birthdayLayout.putBirthday(contact, state.birthdayReminder)
+        address.putDetail(addressValue, R.drawable.ic_location)
     }
 
     private fun drawLoadingState() = with(binding) {
         loadingBar.isVisible = true
         scrollView.isVisible = false
+        toolbar.title = getString(R.string.loading)
     }
 
     private fun drawFailureState() = with(binding) {
         loadingBar.isVisible = false
         scrollView.isVisible = false
+        toolbar.title = getString(R.string.contact_details)
     }
 
-    private fun TextView.putText(titleView: TextView, textValue: String) {
-        if (textValue.isNotEmpty()) {
-            titleView.isVisible = true
-            isVisible = true
-            text = textValue
+    private fun IncludeContactDetailBinding.putDetail(
+        value: String,
+        @DrawableRes icon: Int = 0,
+    ) {
+        if (value.isNotEmpty()) {
+            root.isVisible = true
+            detailIcon.setImageResource(icon)
+            detailValue.text = value
         } else {
-            titleView.isVisible = false
-            isVisible = false
+            root.isVisible = false
         }
     }
+
+    private fun IncludeContactDetailMultilineBinding.putDetail(
+        value: String,
+        @StringRes desc: Int,
+        @DrawableRes icon: Int = 0,
+    ) {
+        if (value.isNotEmpty()) {
+            root.isVisible = true
+            detailIcon.setImageResource(icon)
+            detailValue.text = value
+            detailDesc.text = getString(desc)
+        } else {
+            root.isVisible = false
+        }
+    }
+
+    private fun RelativeLayout.putBirthday(contact: ContactParcelable, reminder: Boolean) =
+        with(binding) {
+            if (contact.birthdayMonth != -1 && contact.birthdayDayOfMonth != -1) {
+                isVisible = true
+                birthday.putDetail(
+                    getString(
+                        R.string.birthday_value,
+                        contact.birthdayMonth,
+                        contact.birthdayDayOfMonth,
+                    ),
+                    R.string.birthday,
+                    R.drawable.ic_event,
+                )
+                if (reminder) {
+                    birthdayReminder.setImageResource(R.drawable.ic_notifications_active)
+                    birthdayReminder.setColorFilter(
+                        ResourcesCompat.getColor(resources, R.color.teal_500, null)
+                    )
+                } else {
+                    birthdayReminder.setImageResource(R.drawable.ic_notifications_none)
+                    birthdayReminder.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN)
+                }
+            } else {
+                isVisible = false
+            }
+        }
 }

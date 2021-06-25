@@ -52,6 +52,7 @@ dependencies {
     val fragmentVersion = "1.3.3"
     val lifecycleVersion = "2.3.1"
     val constraintlayoutVersion = "2.0.4"
+    val swiperefreshlayoutVersion = "1.1.0"
     val materialVersion = "1.3.0"
     val playServicesVersion = "18.0.0"
     val mapsVersion = "2.3.0"
@@ -70,6 +71,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion")
     implementation("androidx.constraintlayout:constraintlayout:$constraintlayoutVersion")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:$swiperefreshlayoutVersion")
 
     implementation("com.google.android.material:material:$materialVersion")
     implementation("com.google.android.gms:play-services-location:$playServicesVersion")

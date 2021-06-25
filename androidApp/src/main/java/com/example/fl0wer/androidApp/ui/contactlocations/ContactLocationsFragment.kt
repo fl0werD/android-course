@@ -18,6 +18,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.ktx.addMarker
 import kotlinx.coroutines.flow.collect
@@ -31,6 +32,7 @@ class ContactLocationsFragment : Fragment() {
     }
     private lateinit var binding: FragmentContactLocationsBinding
     private var mapFragment: SupportMapFragment? = null
+    private var mapMarker: Marker? = null
 
     companion object {
         fun newInstance() = ContactLocationsFragment()
@@ -57,6 +59,11 @@ class ContactLocationsFragment : Fragment() {
             }
         }
         mapFragment = childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
+        mapFragment?.getMapAsync {
+            it.setOnMapLongClickListener { location ->
+                viewModel.mapLongClicked(location)
+            }
+        }
         lifecycleScope.launchWhenStarted {
             viewModel.uiState.collect {
                 updateState(it)
@@ -77,8 +84,19 @@ class ContactLocationsFragment : Fragment() {
 
     private fun drawIdleState(state: ContactLocationsState.Idle) = with(binding) {
         toolbar.title = getString(R.string.contacts_locations)
-        mapFragment?.getMapAsync {
-            it.showMarkers(state.locations)
+        if (state.editMode) {
+            state.locations.firstOrNull()?.apply {
+                mapFragment?.getMapAsync {
+                    mapMarker?.remove()
+                    mapMarker = it.addMarker {
+                        position(LatLng(latitude, longitude))
+                    }
+                }
+            }
+        } else {
+            mapFragment?.getMapAsync {
+                it.showMarkers(state.locations)
+            }
         }
     }
 

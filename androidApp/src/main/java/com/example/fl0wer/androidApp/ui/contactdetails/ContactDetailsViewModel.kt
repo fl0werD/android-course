@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.fl0wer.androidApp.data.contacts.ContactMapper.toContact
 import com.example.fl0wer.androidApp.data.contacts.ContactMapper.toParcelable
+import com.example.fl0wer.androidApp.data.contacts.ContactParcelable
 import com.example.fl0wer.androidApp.data.locations.LocationMapper.toParcelable
+import com.example.fl0wer.androidApp.ui.core.navigation.Screens
 import com.example.fl0wer.androidApp.ui.nullOr
 import com.example.fl0wer.domain.contacts.ContactsInteractor
 import com.example.fl0wer.domain.contacts.ReminderInteractor
@@ -13,6 +15,7 @@ import com.example.fl0wer.domain.core.dispatchers.DispatchersProvider
 import com.example.fl0wer.domain.locations.LocationInteractor
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.back
+import com.github.terrakok.modo.forward
 import com.google.android.gms.maps.model.LatLng
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -34,41 +37,35 @@ class ContactDetailsViewModel @AssistedInject constructor(
     @Assisted contactLookupKey: String,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<ContactDetailsState>(ContactDetailsState.Loading)
-    val uiState: StateFlow<ContactDetailsState> get() = _uiState
+    val uiState get() = _uiState.asStateFlow()
     private val vmScope = viewModelScope + CoroutineExceptionHandler { _, e ->
         if (e !is CancellationException) {
             Timber.e(e)
         }
     }
-    private val contactId = MutableStateFlow(0)
 
     init {
         loadContact(contactLookupKey)
-        subscribeLocation()
     }
 
-    fun changeBirthdayNotice() {
+    fun changeBirthdayReminder() {
         val currentState = uiState.value.nullOr<ContactDetailsState.Idle>() ?: return
         vmScope.launch {
             try {
-                reminderInteractor.changeBirthdayReminder(currentState.contact.toContact())
-                _uiState.value =
-                    currentState.copy(birthdayReminder = !currentState.birthdayReminder)
+                val contact = currentState.contact.toContact()
+                reminderInteractor.changeBirthdayReminder(contact)
+                _uiState.value = currentState.copy(
+                    birthdayReminder = reminderInteractor.birthdayReminder(contact)
+                )
             } catch (e: IOException) {
                 _uiState.value = ContactDetailsState.Failure
             }
         }
     }
 
-    fun mapClicked(location: LatLng) {
-        val currentState = uiState.value.nullOr<ContactDetailsState.Idle>() ?: return
-        vmScope.launch {
-            locationInteractor.mapClicked(
-                currentState.contact.id,
-                location.latitude,
-                location.longitude,
-            )
-        }
+    fun addressClicked() {
+        uiState.value.nullOr<ContactDetailsState.Idle>() ?: return
+        modo.forward(Screens.ContactLocations())
     }
 
     fun backPressed() {
@@ -79,12 +76,14 @@ class ContactDetailsViewModel @AssistedInject constructor(
         vmScope.launch {
             _uiState.value = ContactDetailsState.Loading
             try {
-                val contact = contactsInteractor.contact(lookupKey)
-                if (contact != null) {
+                val result = contactsInteractor.contact(lookupKey)
+                if (result != null) {
+                    val contact = result.toParcelable()
                     _uiState.value = ContactDetailsState.Idle(
-                        contact.toParcelable(),
-                        reminderInteractor.birthdayReminder(contact),
+                        contact,
+                        reminderInteractor.birthdayReminder(result)
                     )
+                    subscribeLocation(contact)
                 } else {
                     _uiState.value = ContactDetailsState.Failure
                 }
@@ -94,21 +93,23 @@ class ContactDetailsViewModel @AssistedInject constructor(
         }
     }
 
-    private fun subscribeLocation() = vmScope.launch {
-        locationInteractor.observeLocation(1)
+    private fun subscribeLocation(contact: ContactParcelable) = vmScope.launch {
+        locationInteractor.observeLocation(contact.id)
             .map {
                 val currentState = uiState.value
                 if (currentState is ContactDetailsState.Idle) {
                     currentState.copy(
-                       location = it?.toParcelable()
-                   )
+                        location = it?.toParcelable()
+                    )
                 } else {
-                    currentState
+                    null
                 }
             }
             .flowOn(dispatchersProvider.io)
             .collect { newState ->
-                _uiState.value = newState
+                if (newState != null) {
+                    _uiState.value = newState
+                }
             }
     }
 

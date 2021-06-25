@@ -60,149 +60,69 @@
                     android:layout_marginBottom="16dp"
                     android:textAlignment="center"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    android:textSize="24sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
                     tools:text="Имя" />
 
-                <TextView
-                    android:id="@+id/phone_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/phone_main"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
-
-                <TextView
+                <include
                     android:id="@+id/phone"
+                    layout="@layout/include_contact_detail_multiline"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="12dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    android:textSize="18sp"
-                    tools:text="Номер" />
+                    android:layout_height="wrap_content" />
 
-                <TextView
-                    android:id="@+id/phone2_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/phone_mobile"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
-
-                <TextView
+                <include
                     android:id="@+id/phone2"
+                    layout="@layout/include_contact_detail_multiline"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="12dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    android:textSize="18sp"
-                    tools:text="Номер 2" />
+                    android:layout_height="wrap_content" />
 
-                <TextView
-                    android:id="@+id/email_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/email_main"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
-
-                <TextView
+                <include
                     android:id="@+id/email"
+                    layout="@layout/include_contact_detail_multiline"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="12dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    android:textSize="18sp"
-                    tools:text="Email" />
+                    android:layout_height="wrap_content" />
 
-                <TextView
-                    android:id="@+id/email2_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/email_secondary"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
-
-                <TextView
+                <include
                     android:id="@+id/email2"
+                    layout="@layout/include_contact_detail_multiline"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="12dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    android:textSize="18sp"
-                    tools:text="Email 2" />
-
-                <TextView
-                    android:id="@+id/birthday_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/birthday"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
+                    android:layout_height="wrap_content" />
 
                 <RelativeLayout
+                    android:id="@+id/birthday_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp">
+                    android:layout_height="wrap_content">
 
-                    <TextView
+                    <include
                         android:id="@+id/birthday"
+                        layout="@layout/include_contact_detail_multiline"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                        android:textSize="18sp"
-                        tools:text="Число месяц" />
+                        android:layout_height="wrap_content">
+                    </include>
 
                     <ImageView
-                        android:id="@+id/birthday_notice"
+                        android:id="@+id/birthday_reminder"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_toEndOf="@+id/birthday"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="16dp"
                         tools:ignore="contentDescription"
                         tools:srcCompat="@drawable/ic_notifications_none" />
                 </RelativeLayout>
 
-                <TextView
-                    android:id="@+id/note_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/note"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
-
-                <TextView
+                <include
                     android:id="@+id/note"
+                    layout="@layout/include_contact_detail"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="12dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    android:textSize="18sp"
-                    android:textStyle="italic"
-                    tools:text="Заметка" />
+                    android:layout_height="wrap_content" />
 
-                <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/map"
+                <include
+                    android:id="@+id/address"
+                    layout="@layout/include_contact_detail"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:name="com.google.android.gms.maps.SupportMapFragment" />
+                    android:layout_height="wrap_content" />
             </LinearLayout>
         </ScrollView>
     </FrameLayout>

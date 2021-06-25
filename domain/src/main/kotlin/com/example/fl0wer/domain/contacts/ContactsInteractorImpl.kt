@@ -3,9 +3,9 @@ package com.example.fl0wer.domain.contacts
 class ContactsInteractorImpl(
     private val contactsRepository: ContactsRepository,
 ) : ContactsInteractor {
-    override suspend fun contacts(): List<Contact> {
+    override suspend fun contacts(forceUpdate: Boolean): List<Contact> {
         val contacts = contactsRepository.contacts()
-        return if (contacts.isEmpty()) {
+        return if (contacts.isEmpty() || forceUpdate) {
             contactsRepository.loadContacts()
         } else {
             contacts

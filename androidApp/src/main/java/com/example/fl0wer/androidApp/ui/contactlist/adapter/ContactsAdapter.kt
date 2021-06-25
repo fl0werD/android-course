@@ -20,8 +20,7 @@ val contactDiffCallback = object : DiffUtil.ItemCallback<ContactListItem>() {
         oldItem.contact.id == newItem.contact.id
 
     override fun areContentsTheSame(oldItem: ContactListItem, newItem: ContactListItem) =
-        oldItem.contact.name == newItem.contact.name &&
-            oldItem.contact.phone == newItem.contact.phone
+        oldItem.contact.name == newItem.contact.name
 }
 
 fun contactItemDecorator(context: Context) = object : RecyclerView.ItemDecoration() {
@@ -57,7 +56,6 @@ fun contactItemDecorator(context: Context) = object : RecyclerView.ItemDecoratio
 class ContactsAdapter(
     private val scrollToTopListener: () -> Unit,
     private val contactClickListener: (Int) -> Unit,
-    private val contactStateChangedListener: (Int) -> Unit,
 ) : ListAdapter<ContactListItem, ContactsAdapter.ViewHolder>(contactDiffCallback) {
     var items = listOf<ContactListItem>()
         set(value) = submitList(value)
@@ -103,34 +101,16 @@ class ContactsAdapter(
                         contactClicked(position)
                     }
                 }
-                root.setOnLongClickListener {
-                    root.isChecked = !root.isChecked
-                    true
-                }
-                root.setOnCheckedChangeListener { _, checked ->
-                    val position = adapterPosition
-                    if (position != RecyclerView.NO_POSITION) {
-                        contactStateChangedListener(position)
-                    }
-                }
-                photo.setOnClickListener {
-                    root.isChecked = !root.isChecked
-                }
             }
         }
 
         fun bind(item: ContactListItem) = with(binding) {
-            if (item.checked) {
-                photo.setImageResource(R.drawable.ic_done)
+            if (item.contact.photo == 0) {
+                photo.setImageResource(R.drawable.ic_contact)
             } else {
-                if (item.contact.photo == 0) {
-                    photo.setImageResource(R.drawable.ic_contact)
-                } else {
-                    photo.setImageResource(item.contact.photo)
-                }
+                photo.setImageResource(item.contact.photo)
             }
             name.text = item.contact.name
-            phoneNumber.text = item.contact.phone
         }
     }
 }

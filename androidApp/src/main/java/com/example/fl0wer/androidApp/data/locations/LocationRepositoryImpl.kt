@@ -4,10 +4,12 @@ import com.example.fl0wer.androidApp.data.core.network.GoogleApi
 import com.example.fl0wer.androidApp.data.locations.LocationMapper.toEntity
 import com.example.fl0wer.androidApp.data.locations.LocationMapper.toLocation
 import com.example.fl0wer.androidApp.data.locations.database.LocationDao
+import com.example.fl0wer.domain.core.Result
 import com.example.fl0wer.domain.locations.Location
 import com.example.fl0wer.domain.locations.LocationRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.io.IOException
 
 class LocationRepositoryImpl(
     private val locationDao: LocationDao,
@@ -33,12 +35,12 @@ class LocationRepositoryImpl(
         locationDao.insert(location.toEntity())
     }
 
-    override suspend fun reverseGeocode(latitude: Double, longitude: Double): String? {
+    override suspend fun reverseGeocode(latitude: Double, longitude: Double): Result<String> {
         val response = googleApi.reverseGeocode("$latitude,$longitude")
         return if (response.status == "OK") {
-            response.results[0].address
+            Result.Success(response.results[0].address)
         } else {
-            null
+            Result.Failure(IOException("Status not OK"))
         }
     }
 }

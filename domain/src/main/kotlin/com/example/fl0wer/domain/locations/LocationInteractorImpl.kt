@@ -1,5 +1,6 @@
 package com.example.fl0wer.domain.locations
 
+import com.example.fl0wer.domain.core.Result
 import com.example.fl0wer.domain.core.dispatchers.DispatchersProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -13,19 +14,24 @@ class LocationInteractorImpl(
         return locationRepository.observeLocation(contactId)
     }
 
-    override suspend fun mapClicked(contactId: Int, latitude: Double, longitude: Double) =
+    override suspend fun mapClicked(contactId: Int, latitude: Double, longitude: Double): Unit =
         withContext(dispatchersProvider.io) {
             try {
-                val address = locationRepository.reverseGeocode(latitude, longitude)
-                    ?: throw IOException("Address null")
-                locationRepository.save(
-                    Location(
-                        contactId,
-                        latitude,
-                        longitude,
-                        address
-                    )
-                )
+                when (val result = locationRepository.reverseGeocode(latitude, longitude)) {
+                    is Result.Success -> {
+                        locationRepository.save(
+                            Location(
+                                contactId,
+                                latitude,
+                                longitude,
+                                result.value,
+                            )
+                        )
+                    }
+                    is Result.Failure -> {
+                        result.throwable
+                    }
+                }
             } catch (e: Exception) {
                 throw e
             }

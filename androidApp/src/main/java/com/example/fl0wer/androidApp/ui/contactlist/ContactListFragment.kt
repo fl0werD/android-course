@@ -19,6 +19,7 @@ import com.example.fl0wer.androidApp.ui.contactlist.adapter.contactItemDecorator
 import com.example.fl0wer.databinding.FragmentContactListBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collect
+import timber.log.Timber
 
 class ContactListFragment : Fragment() {
     @Inject
@@ -32,7 +33,6 @@ class ContactListFragment : Fragment() {
         ContactsAdapter(
             { binding.contactsList.layoutManager?.scrollToPosition(0) },
             { position -> viewModel.contactClicked(position) },
-            { position -> viewModel.contactStateChanged(position) },
         )
     }
 
@@ -74,6 +74,9 @@ class ContactListFragment : Fragment() {
             addItemDecoration(contactItemDecorator(context))
         }
         with(binding) {
+            swipeToRefresh.setOnRefreshListener {
+                viewModel.swipeRefresh()
+            }
             showAllPins.setOnClickListener {
                 viewModel.contactPinsClicked()
             }
@@ -99,6 +102,7 @@ class ContactListFragment : Fragment() {
     private fun drawIdleState(state: ContactListState.Idle) = with(binding) {
         contactsAdapter.items = state.contacts
         loadingBar.isVisible = false
+        swipeToRefresh.isRefreshing = false
         contactsList.isVisible = true
         routes.isVisible = true
         showAllPins.isVisible = true
@@ -106,6 +110,7 @@ class ContactListFragment : Fragment() {
 
     private fun drawLoadingState() = with(binding) {
         loadingBar.isVisible = true
+        swipeToRefresh.isRefreshing = false
         contactsList.isVisible = false
         routes.isVisible = false
         showAllPins.isVisible = false
@@ -113,6 +118,7 @@ class ContactListFragment : Fragment() {
 
     private fun drawFailureState() = with(binding) {
         loadingBar.isVisible = false
+        swipeToRefresh.isRefreshing = false
         contactsList.isVisible = true
         routes.isVisible = false
         showAllPins.isVisible = false

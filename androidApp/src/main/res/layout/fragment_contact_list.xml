@@ -12,10 +12,10 @@
         android:layout_height="wrap_content">
 
         <com.google.android.material.appbar.MaterialToolbar
-            android:theme="@style/ThemeOverlay.SearchToolbar"
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:theme="@style/ThemeOverlay.SearchToolbar"
             app:menu="@menu/contact_list"
             app:title="@string/contacts_list"
             app:titleTextColor="@color/white" />
@@ -32,15 +32,21 @@
             android:layout_gravity="center"
             tools:visibility="gone" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/contacts_list"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_to_refresh"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical"
-            android:overScrollMode="never"
-            android:visibility="gone"
-            tools:visibility="visible"
-            tools:listitem="@layout/item_contact_card"/>
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/contacts_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never"
+                android:scrollbars="vertical"
+                android:visibility="gone"
+                tools:listitem="@layout/item_contact_card"
+                tools:visibility="visible" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/show_all_pins"

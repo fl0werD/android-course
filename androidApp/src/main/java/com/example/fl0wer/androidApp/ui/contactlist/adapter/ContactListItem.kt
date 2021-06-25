@@ -7,5 +7,4 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class ContactListItem(
     val contact: ContactParcelable,
-    var checked: Boolean,
 ): Parcelable
