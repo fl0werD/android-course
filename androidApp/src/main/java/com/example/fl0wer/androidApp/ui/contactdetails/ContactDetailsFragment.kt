@@ -70,6 +70,9 @@ class ContactDetailsFragment : Fragment() {
             address.root.setOnClickListener {
                 viewModel.addressClicked()
             }
+            routes.setOnClickListener {
+                viewModel.routesClicked()
+            }
         }
         lifecycleScope.launchWhenStarted {
             viewModel.uiState.collect {
@@ -105,17 +108,20 @@ class ContactDetailsFragment : Fragment() {
         note.putDetail(contact.note, R.drawable.ic_note)
         birthdayLayout.putBirthday(contact, state.birthdayReminder)
         address.putDetail(addressValue, R.drawable.ic_location)
+        routes.isVisible = true
     }
 
     private fun drawLoadingState() = with(binding) {
         loadingBar.isVisible = true
         scrollView.isVisible = false
+        routes.isVisible = false
         toolbar.title = getString(R.string.loading)
     }
 
     private fun drawFailureState() = with(binding) {
         loadingBar.isVisible = false
         scrollView.isVisible = false
+        routes.isVisible = false
         toolbar.title = getString(R.string.contact_details)
     }
 

@@ -11,15 +11,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.fl0wer.androidApp.di.App
 import com.example.fl0wer.R
+import com.example.fl0wer.androidApp.di.App
 import com.example.fl0wer.androidApp.ui.UiState
 import com.example.fl0wer.androidApp.ui.contactlist.adapter.ContactsAdapter
 import com.example.fl0wer.androidApp.ui.contactlist.adapter.contactItemDecorator
 import com.example.fl0wer.databinding.FragmentContactListBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collect
-import timber.log.Timber
 
 class ContactListFragment : Fragment() {
     @Inject
@@ -30,10 +29,9 @@ class ContactListFragment : Fragment() {
     private lateinit var binding: FragmentContactListBinding
 
     private val contactsAdapter by lazy {
-        ContactsAdapter(
-            { binding.contactsList.layoutManager?.scrollToPosition(0) },
-            { position -> viewModel.contactClicked(position) },
-        )
+        ContactsAdapter { position ->
+            viewModel.contactClicked(position)
+        }
     }
 
     companion object {
@@ -80,9 +78,6 @@ class ContactListFragment : Fragment() {
             showAllPins.setOnClickListener {
                 viewModel.contactPinsClicked()
             }
-            routes.setOnClickListener {
-                viewModel.routesClicked()
-            }
         }
         lifecycleScope.launchWhenStarted {
             viewModel.uiState.collect {
@@ -104,7 +99,6 @@ class ContactListFragment : Fragment() {
         loadingBar.isVisible = false
         swipeToRefresh.isRefreshing = false
         contactsList.isVisible = true
-        routes.isVisible = true
         showAllPins.isVisible = true
     }
 
@@ -112,7 +106,6 @@ class ContactListFragment : Fragment() {
         loadingBar.isVisible = true
         swipeToRefresh.isRefreshing = false
         contactsList.isVisible = false
-        routes.isVisible = false
         showAllPins.isVisible = false
     }
 
@@ -120,7 +113,6 @@ class ContactListFragment : Fragment() {
         loadingBar.isVisible = false
         swipeToRefresh.isRefreshing = false
         contactsList.isVisible = true
-        routes.isVisible = false
         showAllPins.isVisible = false
     }
 }

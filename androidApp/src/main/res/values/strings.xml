@@ -10,7 +10,7 @@
     <string name="request_permission">Запросить разрешение</string>
 
     <!-- Contact List. -->
-    <string name="contacts_list">Список контактов</string>
+    <string name="contacts_list">Контакты</string>
     <string name="search_hint">Имя</string>
 
     <!-- Contact Details. -->
@@ -31,4 +31,13 @@
     <!-- Contacts Direction. -->
     <string name="route">Маршрут</string>
     <string name="route_not_found">Не удалось проложить маршрут</string>
+
+    <plurals name="contacts_count">
+        <item quantity="zero">%1$d контактов</item>
+        <item quantity="one">%1$d контакт</item>
+        <item quantity="two">%1$d контакта</item>
+        <item quantity="few">%1$d контакта</item>
+        <item quantity="many">%1$d контактов</item>
+        <item quantity="other">%1$d контактов</item>
+    </plurals>
 </resources>

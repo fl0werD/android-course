@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,121 +9,143 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="200dp">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:navigationIcon="@drawable/ic_arrow_back"
-            app:title="@string/contact_details"
-            app:titleTextColor="@color/white" />
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <ProgressBar
-            android:id="@+id/loading_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            tools:visibility="gone" />
-
-        <ScrollView
-            android:id="@+id/scroll_view"
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:visibility="gone"
-            tools:visibility="visible">
+            app:contentScrim="@android:color/black"
+            app:expandedTitleGravity="top"
+            app:expandedTitleMarginStart="48dp"
+            app:expandedTitleMarginEnd="64dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-            <LinearLayout
+            <ImageView
+                android:id="@+id/photo"
+                android:layout_width="128dp"
+                android:layout_height="128dp"
+                android:layout_gravity="center"
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.7"
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/ic_contact" />
+
+            <TextView
+                android:id="@+id/name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_below="@+id/photo"
+                android:layout_gravity="bottom"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                tools:text="Имя" />
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_collapseMode="pin"
+                app:navigationIcon="@drawable/ic_arrow_back"
+                app:titleTextColor="@color/white" />
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ProgressBar
+        android:id="@+id/loading_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        tools:visibility="gone" />
+
+    <ScrollView
+        android:id="@+id/scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:visibility="gone"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/phone"
+                layout="@layout/include_contact_detail_multiline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"/>
+
+            <include
+                android:id="@+id/phone2"
+                layout="@layout/include_contact_detail_multiline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <include
+                android:id="@+id/email"
+                layout="@layout/include_contact_detail_multiline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <include
+                android:id="@+id/email2"
+                layout="@layout/include_contact_detail_multiline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <RelativeLayout
+                android:id="@+id/birthday_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <include
+                    android:id="@+id/birthday"
+                    layout="@layout/include_contact_detail_multiline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
                 <ImageView
-                    android:id="@+id/photo"
-                    android:layout_width="128dp"
-                    android:layout_height="128dp"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="16dp"
-                    tools:ignore="ContentDescription"
-                    tools:src="@drawable/ic_contact" />
-
-                <TextView
-                    android:id="@+id/name"
-                    android:layout_width="match_parent"
+                    android:id="@+id/birthday_reminder"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:textAlignment="center"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    tools:text="Имя" />
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    tools:ignore="contentDescription"
+                    tools:srcCompat="@drawable/ic_notifications_none" />
+            </RelativeLayout>
 
-                <include
-                    android:id="@+id/phone"
-                    layout="@layout/include_contact_detail_multiline"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+            <include
+                android:id="@+id/note"
+                layout="@layout/include_contact_detail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-                <include
-                    android:id="@+id/phone2"
-                    layout="@layout/include_contact_detail_multiline"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+            <include
+                android:id="@+id/address"
+                layout="@layout/include_contact_detail"
+                android:layout_marginBottom="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </ScrollView>
 
-                <include
-                    android:id="@+id/email"
-                    layout="@layout/include_contact_detail_multiline"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <include
-                    android:id="@+id/email2"
-                    layout="@layout/include_contact_detail_multiline"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <RelativeLayout
-                    android:id="@+id/birthday_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <include
-                        android:id="@+id/birthday"
-                        layout="@layout/include_contact_detail_multiline"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-                    </include>
-
-                    <ImageView
-                        android:id="@+id/birthday_reminder"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        tools:ignore="contentDescription"
-                        tools:srcCompat="@drawable/ic_notifications_none" />
-                </RelativeLayout>
-
-                <include
-                    android:id="@+id/note"
-                    layout="@layout/include_contact_detail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <include
-                    android:id="@+id/address"
-                    layout="@layout/include_contact_detail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-        </ScrollView>
-    </FrameLayout>
-</LinearLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/routes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/ic_directions"
+        tools:ignore="ContentDescription" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

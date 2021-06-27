@@ -51,13 +51,15 @@ dependencies {
     val appcompatVersion = "1.2.0"
     val fragmentVersion = "1.3.3"
     val lifecycleVersion = "2.3.1"
-    val constraintlayoutVersion = "2.0.4"
-    val swiperefreshlayoutVersion = "1.1.0"
+    //val constraintLayoutVersion = "2.0.4"
+    val swipeRefreshLayoutVersion = "1.1.0"
+    val coordinatorLayoutVersion = "1.1.0"
     val materialVersion = "1.3.0"
     val playServicesVersion = "18.0.0"
     val mapsVersion = "2.3.0"
     val retrofitVersion = "2.9.0"
     val roomVersion = "2.3.0"
+    val adapterDelegatesVersion = "4.3.0"
     val timberVersion = "4.7.1"
     val modoVersion = "0.6.1"
 
@@ -70,8 +72,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion")
-    implementation("androidx.constraintlayout:constraintlayout:$constraintlayoutVersion")
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:$swiperefreshlayoutVersion")
+    //implementation("androidx.constraintlayout:constraintlayout:$constraintLayoutVersion")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshLayoutVersion")
+    implementation("androidx.coordinatorlayout:coordinatorlayout:$coordinatorLayoutVersion")
 
     implementation("com.google.android.material:material:$materialVersion")
     implementation("com.google.android.gms:play-services-location:$playServicesVersion")
@@ -85,6 +88,7 @@ dependencies {
     kapt("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
 
+    implementation("com.hannesdorfmann:adapterdelegates4-kotlin-dsl-viewbinding:$adapterDelegatesVersion")
     implementation("com.jakewharton.timber:timber:$timberVersion")
 
     implementation("com.github.terrakok:modo:$modoVersion")

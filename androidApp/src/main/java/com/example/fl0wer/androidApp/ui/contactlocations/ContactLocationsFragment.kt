@@ -19,10 +19,9 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.ktx.addMarker
-import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
+import kotlinx.coroutines.flow.collect
 
 class ContactLocationsFragment : Fragment() {
     @Inject

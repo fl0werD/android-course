@@ -7,6 +7,7 @@ import com.example.fl0wer.androidApp.data.contacts.ContactMapper.toContact
 import com.example.fl0wer.androidApp.data.contacts.ContactMapper.toParcelable
 import com.example.fl0wer.androidApp.data.contacts.ContactParcelable
 import com.example.fl0wer.androidApp.data.locations.LocationMapper.toParcelable
+import com.example.fl0wer.androidApp.ui.contactlist.ContactListState
 import com.example.fl0wer.androidApp.ui.core.navigation.Screens
 import com.example.fl0wer.androidApp.ui.nullOr
 import com.example.fl0wer.domain.contacts.ContactsInteractor
@@ -66,6 +67,11 @@ class ContactDetailsViewModel @AssistedInject constructor(
     fun addressClicked() {
         uiState.value.nullOr<ContactDetailsState.Idle>() ?: return
         modo.forward(Screens.ContactLocations())
+    }
+
+    fun routesClicked() {
+        uiState.value.nullOr<ContactListState.Idle>() ?: return
+        modo.forward(Screens.ContactsRoute(1, 5))
     }
 
     fun backPressed() {

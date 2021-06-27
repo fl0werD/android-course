@@ -7,4 +7,5 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="dividerColor">#1F000000</color>
+    <color name="alpha_transparent">#33000000</color>
 </resources>

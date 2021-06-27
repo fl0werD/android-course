@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
+
+    <ProgressBar
+        android:id="@+id/loading_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        tools:visibility="gone" />
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
@@ -16,56 +23,36 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:theme="@style/ThemeOverlay.SearchToolbar"
+            app:layout_scrollFlags="scroll|enterAlways"
             app:menu="@menu/contact_list"
             app:title="@string/contacts_list"
             app:titleTextColor="@color/white" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <FrameLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_to_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <ProgressBar
-            android:id="@+id/loading_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            tools:visibility="gone" />
-
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipe_to_refresh"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/contacts_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/contacts_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:overScrollMode="never"
-                android:scrollbars="vertical"
-                android:visibility="gone"
-                tools:listitem="@layout/item_contact_card"
-                tools:visibility="visible" />
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/show_all_pins"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="24dp"
-            android:src="@drawable/ic_contact_pin"
-            tools:ignore="ContentDescription" />
+            android:overScrollMode="never"
+            android:scrollbars="vertical"
+            android:visibility="gone"
+            tools:listitem="@layout/item_contact_card"
+            tools:visibility="visible" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/routes"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="96dp"
-            android:src="@drawable/ic_directions"
-            tools:ignore="ContentDescription" />
-    </FrameLayout>
-</LinearLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/show_all_pins"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/ic_contact_pin"
+        tools:ignore="ContentDescription" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -12,14 +12,14 @@ import com.example.fl0wer.domain.contacts.ContactsInteractor
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.forward
 import dagger.assisted.AssistedInject
+import java.io.IOException
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import timber.log.Timber
-import java.io.IOException
-import kotlin.coroutines.cancellation.CancellationException
 
 @Suppress("SwallowedException")
 class ContactListViewModel @AssistedInject constructor(
@@ -40,8 +40,8 @@ class ContactListViewModel @AssistedInject constructor(
 
     fun contactClicked(position: Int) {
         val currentState = uiState.value.nullOr<ContactListState.Idle>() ?: return
-        val contact = currentState.contacts[position].contact
-        modo.forward(Screens.ContactDetails(contact.lookupKey))
+        val contactList = (currentState.contacts[position] as? ContactListItem.Contact) ?: return
+        modo.forward(Screens.ContactDetails(contactList.contact.lookupKey))
     }
 
     fun swipeRefresh() {
@@ -52,11 +52,6 @@ class ContactListViewModel @AssistedInject constructor(
     fun contactPinsClicked() {
         uiState.value.nullOr<ContactListState.Idle>() ?: return
         modo.forward(Screens.ContactLocations())
-    }
-
-    fun routesClicked() {
-        uiState.value.nullOr<ContactListState.Idle>() ?: return
-        modo.forward(Screens.ContactsRoute(1, 5))
     }
 
     fun searchTextChanged(nameFilter: String) {
@@ -89,8 +84,10 @@ class ContactListViewModel @AssistedInject constructor(
     }
 
     private fun List<Contact>.toListItems() = map {
-        ContactListItem(it.toParcelable())
-    }
+        ContactListItem.Contact(it.toParcelable())
+    } + listOf(
+        ContactListItem.Footer(size)
+    )
 
     companion object {
         fun provideFactory(
