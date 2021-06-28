@@ -1,7 +1,10 @@
 package com.example.fl0wer.domain.contacts
 
+import com.example.fl0wer.domain.locations.LocationRepository
+
 class ContactsInteractorImpl(
     private val contactsRepository: ContactsRepository,
+    private val locationRepository: LocationRepository,
 ) : ContactsInteractor {
     override suspend fun contacts(forceUpdate: Boolean): List<Contact> {
         val contacts = contactsRepository.contacts()
@@ -24,5 +27,20 @@ class ContactsInteractorImpl(
         } else {
             contactsRepository.contacts()
         }
+    }
+
+    override suspend fun contactsWithAddress(ignoreContactId: Int): List<Contact> {
+        val withAddressList = mutableListOf<Contact>()
+        contactsRepository.contacts().forEach { contact ->
+            locationRepository.locations().forEach { location ->
+                if (contact.id == location.id &&
+                    contact.id != ignoreContactId &&
+                    location.address.isNotEmpty()
+                ) {
+                    withAddressList.add(contact)
+                }
+            }
+        }
+        return withAddressList
     }
 }

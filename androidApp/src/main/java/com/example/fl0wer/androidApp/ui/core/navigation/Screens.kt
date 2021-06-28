@@ -1,9 +1,13 @@
 package com.example.fl0wer.androidApp.ui.core.navigation
 
 import com.example.fl0wer.androidApp.ui.contactdetails.ContactDetailsFragment
+import com.example.fl0wer.androidApp.ui.contactdetails.ContactDetailsScreenParams
 import com.example.fl0wer.androidApp.ui.contactlist.ContactListFragment
+import com.example.fl0wer.androidApp.ui.contactlocation.ContactLocationFragment
+import com.example.fl0wer.androidApp.ui.contactlocation.ContactLocationScreenParams
 import com.example.fl0wer.androidApp.ui.contactlocations.ContactLocationsFragment
 import com.example.fl0wer.androidApp.ui.contactsroute.ContactsRouteFragment
+import com.example.fl0wer.androidApp.ui.contactsroute.ContactsRouteScreenParams
 import com.github.terrakok.modo.android.AppScreen
 import kotlinx.parcelize.Parcelize
 
@@ -15,21 +19,39 @@ object Screens {
 
     @Parcelize
     class ContactDetails(
-        private val contactId: String,
-    ) : AppScreen("Contact_$contactId") {
-        override fun create() = ContactDetailsFragment.newInstance(contactId)
+        private val contactLookupKey: String,
+    ) : AppScreen("Contact_$contactLookupKey") {
+        override fun create() = ContactDetailsFragment.newInstance(
+            ContactDetailsScreenParams(
+                contactLookupKey,
+            )
+        )
     }
 
     @Parcelize
-    class ContactLocations : AppScreen("ContactLocations") {
+    class ContactLocation(
+        private val contactId: Int,
+    ) : AppScreen("Location_$contactId") {
+        override fun create() = ContactLocationFragment.newInstance(
+            ContactLocationScreenParams(
+                contactId,
+            )
+        )
+    }
+
+    @Parcelize
+    class ContactLocations : AppScreen("Locations") {
         override fun create() = ContactLocationsFragment.newInstance()
     }
 
     @Parcelize
     class ContactsRoute(
         private val startContact: Int,
-        private val endContact: Int,
-    ) : AppScreen("Route_${startContact}_${endContact}") {
-        override fun create() = ContactsRouteFragment.newInstance(startContact, endContact)
+    ) : AppScreen("Route_$startContact") {
+        override fun create() = ContactsRouteFragment.newInstance(
+            ContactsRouteScreenParams(
+                startContact,
+            )
+        )
     }
 }

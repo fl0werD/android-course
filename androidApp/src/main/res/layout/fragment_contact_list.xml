@@ -25,7 +25,7 @@
             android:theme="@style/ThemeOverlay.SearchToolbar"
             app:layout_scrollFlags="scroll|enterAlways"
             app:menu="@menu/contact_list"
-            app:title="@string/contacts_list"
+            app:title="@string/contact_list"
             app:titleTextColor="@color/white" />
     </com.google.android.material.appbar.AppBarLayout>
 

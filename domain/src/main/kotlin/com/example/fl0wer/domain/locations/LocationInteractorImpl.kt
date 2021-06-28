@@ -4,7 +4,6 @@ import com.example.fl0wer.domain.core.Result
 import com.example.fl0wer.domain.core.dispatchers.DispatchersProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import java.io.IOException
 
 class LocationInteractorImpl(
     private val locationRepository: LocationRepository,
@@ -14,6 +13,7 @@ class LocationInteractorImpl(
         return locationRepository.observeLocation(contactId)
     }
 
+    @Suppress("TooGenericExceptionCaught", "SwallowedException")
     override suspend fun mapClicked(contactId: Int, latitude: Double, longitude: Double): Unit =
         withContext(dispatchersProvider.io) {
             try {
@@ -33,7 +33,7 @@ class LocationInteractorImpl(
                     }
                 }
             } catch (e: Exception) {
-                throw e
+                // throw e
             }
         }
 

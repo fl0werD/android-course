@@ -11,6 +11,7 @@ import java.io.IOException
 class DirectionRepositoryImpl(
     private val googleApi: GoogleApi,
 ) : DirectionRepository {
+    @Suppress("ReturnCount")
     override suspend fun getRoute(
         origin: String,
         destination: String,

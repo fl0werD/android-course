@@ -1,6 +1,5 @@
 package com.example.fl0wer.domain.core.dispatchers
 
-import com.example.fl0wer.domain.core.dispatchers.DispatchersProvider
 import kotlinx.coroutines.Dispatchers
 
 object DispatchersProviderImpl : DispatchersProvider {

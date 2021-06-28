@@ -8,7 +8,7 @@ sealed class ContactListItem : Parcelable {
     @Parcelize
     data class Contact(
         val contact: ContactParcelable,
-    ): ContactListItem()
+    ) : ContactListItem()
 
     @Parcelize
     data class Footer(

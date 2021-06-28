@@ -11,6 +11,5 @@ sealed class ContactLocationsState : UiState {
     @Parcelize
     data class Idle(
         val locations: List<LocationParcelable>,
-        val editMode: Boolean = false,
     ) : ContactLocationsState()
 }

@@ -9,7 +9,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
-        android:layout_height="200dp">
+        android:layout_height="220dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
@@ -118,8 +118,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp"
+                    android:padding="16dp"
                     tools:ignore="contentDescription"
                     tools:srcCompat="@drawable/ic_notifications_none" />
             </RelativeLayout>

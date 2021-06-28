@@ -4,7 +4,6 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
-import com.example.fl0wer.androidApp.data.locations.database.LocationDatabase
 import com.example.fl0wer.domain.contacts.Contact
 import com.example.fl0wer.domain.contacts.ContactsRepository
 import com.example.fl0wer.domain.core.dispatchers.DispatchersProvider

@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.fl0wer.R
 import com.example.fl0wer.androidApp.di.App
+import com.example.fl0wer.androidApp.di.core.ViewModelFactory
 import com.example.fl0wer.androidApp.ui.UiState
 import com.example.fl0wer.androidApp.ui.contactlist.adapter.ContactsAdapter
 import com.example.fl0wer.androidApp.ui.contactlist.adapter.contactItemDecorator
@@ -22,12 +23,9 @@ import kotlinx.coroutines.flow.collect
 
 class ContactListFragment : Fragment() {
     @Inject
-    lateinit var viewModelFactory: ContactListViewModelFactory
-    private val viewModel: ContactListViewModel by viewModels {
-        ContactListViewModel.provideFactory(viewModelFactory)
-    }
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: ContactListViewModel by viewModels { viewModelFactory }
     private lateinit var binding: FragmentContactListBinding
-
     private val contactsAdapter by lazy {
         ContactsAdapter { position ->
             viewModel.contactClicked(position)

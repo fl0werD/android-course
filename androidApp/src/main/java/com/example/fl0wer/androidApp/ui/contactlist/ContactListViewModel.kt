@@ -1,7 +1,6 @@
 package com.example.fl0wer.androidApp.ui.contactlist
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.fl0wer.androidApp.data.contacts.ContactMapper.toParcelable
 import com.example.fl0wer.androidApp.ui.contactlist.adapter.ContactListItem
@@ -11,18 +10,18 @@ import com.example.fl0wer.domain.contacts.Contact
 import com.example.fl0wer.domain.contacts.ContactsInteractor
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.forward
-import dagger.assisted.AssistedInject
-import java.io.IOException
-import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import timber.log.Timber
+import java.io.IOException
+import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 @Suppress("SwallowedException")
-class ContactListViewModel @AssistedInject constructor(
+class ContactListViewModel @Inject constructor(
     private val contactsInteractor: ContactsInteractor,
     private val modo: Modo,
 ) : ViewModel() {
@@ -59,11 +58,11 @@ class ContactListViewModel @AssistedInject constructor(
         searchContacts(nameFilter)
     }
 
-    private fun loadContacts(refresh: Boolean = false) {
+    private fun loadContacts(reload: Boolean = false) {
         vmScope.launch {
             _uiState.value = ContactListState.Loading
             try {
-                val contacts = contactsInteractor.contacts(refresh)
+                val contacts = contactsInteractor.contacts(reload)
                 _uiState.value = ContactListState.Idle(contacts.toListItems())
             } catch (e: IOException) {
                 _uiState.value = ContactListState.Failure
@@ -88,15 +87,4 @@ class ContactListViewModel @AssistedInject constructor(
     } + listOf(
         ContactListItem.Footer(size)
     )
-
-    companion object {
-        fun provideFactory(
-            assistedFactory: ContactListViewModelFactory,
-        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return assistedFactory.create() as T
-            }
-        }
-    }
 }

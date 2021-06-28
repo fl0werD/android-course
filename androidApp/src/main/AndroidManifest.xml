@@ -31,7 +31,7 @@
         <receiver
             android:name="com.example.fl0wer.androidApp.data.contacts.receiver.ContactBroadcastReceiver"
             android:enabled="true"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.example.fl0wer.intent.action.CONTACT_BIRTHDAY" />
             </intent-filter>

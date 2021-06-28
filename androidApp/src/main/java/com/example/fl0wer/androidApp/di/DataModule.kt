@@ -7,7 +7,12 @@ import com.example.fl0wer.androidApp.data.core.network.GoogleApi
 import com.example.fl0wer.androidApp.data.directions.DirectionRepositoryImpl
 import com.example.fl0wer.androidApp.data.locations.LocationRepositoryImpl
 import com.example.fl0wer.androidApp.data.locations.database.LocationDao
-import com.example.fl0wer.domain.contacts.*
+import com.example.fl0wer.domain.contacts.ContactsInteractor
+import com.example.fl0wer.domain.contacts.ContactsInteractorImpl
+import com.example.fl0wer.domain.contacts.ContactsRepository
+import com.example.fl0wer.domain.contacts.ReminderInteractor
+import com.example.fl0wer.domain.contacts.ReminderInteractorImpl
+import com.example.fl0wer.domain.contacts.ReminderRepository
 import com.example.fl0wer.domain.core.dispatchers.DispatchersProvider
 import com.example.fl0wer.domain.directions.DirectionInteractor
 import com.example.fl0wer.domain.directions.DirectionInteractorImpl
@@ -34,8 +39,10 @@ object DataModule {
     @[Provides Singleton]
     fun bindContactsInteractor(
         contactsRepository: ContactsRepository,
+        locationRepository: LocationRepository,
     ): ContactsInteractor = ContactsInteractorImpl(
         contactsRepository,
+        locationRepository,
     )
 
     @[Provides Singleton]
@@ -57,9 +64,11 @@ object DataModule {
     fun bindLocationRepository(
         locationDao: LocationDao,
         googleApi: GoogleApi,
+        dispatchersProvider: DispatchersProvider,
     ): LocationRepository = LocationRepositoryImpl(
         locationDao,
         googleApi,
+        dispatchersProvider,
     )
 
     @[Provides Singleton]

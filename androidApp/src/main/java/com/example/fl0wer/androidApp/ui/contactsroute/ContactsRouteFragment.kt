@@ -9,10 +9,14 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.fl0wer.R
 import com.example.fl0wer.androidApp.data.directions.BoundsParcelable
 import com.example.fl0wer.androidApp.di.App
+import com.example.fl0wer.androidApp.di.core.ViewModelFactory
 import com.example.fl0wer.androidApp.ui.UiState
+import com.example.fl0wer.androidApp.ui.contactlist.adapter.ContactsAdapter
+import com.example.fl0wer.androidApp.util.Const.BUNDLE_INITIAL_ARGS
 import com.example.fl0wer.androidApp.util.toLatLng
 import com.example.fl0wer.databinding.FragmentContactsRouteBinding
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -23,28 +27,23 @@ import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
+private const val CAMERA_BOUNDS_PADDING = 100
+
 class ContactsRouteFragment : Fragment() {
     @Inject
-    lateinit var viewModelFactory: ContactsRouteViewModelFactory
-    private val viewModel: ContactsRouteViewModel by viewModels {
-        ContactsRouteViewModel.provideFactory(
-            viewModelFactory,
-            arguments?.getInt(ARGUMENT_START_CONTACT_ID, -1) ?: -1,
-            arguments?.getInt(ARGUMENT_END_CONTACT_ID, -1) ?: -1,
-        )
-    }
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: ContactsRouteViewModel by viewModels { viewModelFactory }
     private lateinit var binding: FragmentContactsRouteBinding
     private var mapFragment: SupportMapFragment? = null
+    private val contactsAdapter by lazy {
+        ContactsAdapter { position ->
+            viewModel.contactClicked(position)
+        }
+    }
 
     companion object {
-        private const val ARGUMENT_START_CONTACT_ID = "ARGUMENT_START_CONTACT_ID"
-        private const val ARGUMENT_END_CONTACT_ID = "ARGUMENT_END_CONTACT_ID"
-
-        fun newInstance(startContactId: Int, endContactId: Int) = ContactsRouteFragment().apply {
-            arguments = bundleOf(
-                ARGUMENT_START_CONTACT_ID to startContactId,
-                ARGUMENT_END_CONTACT_ID to endContactId,
-            )
+        fun newInstance(params: ContactsRouteScreenParams) = ContactsRouteFragment().apply {
+            arguments = bundleOf(BUNDLE_INITIAL_ARGS to params)
         }
     }
 
@@ -68,12 +67,21 @@ class ContactsRouteFragment : Fragment() {
                 viewModel.backPressed()
             }
         }
+        with(binding.contactsList) {
+            layoutManager = LinearLayoutManager(context).apply { recycleChildrenOnDetach = true }
+            adapter = contactsAdapter
+        }
         mapFragment = childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
         lifecycleScope.launchWhenStarted {
             viewModel.uiState.collect {
                 updateState(it)
             }
         }
+    }
+
+    fun initialArguments(): ContactsRouteScreenParams {
+        arguments?.getParcelable<ContactsRouteScreenParams>(BUNDLE_INITIAL_ARGS)?.also { return it }
+        throw IllegalArgumentException("Fragment doesn't contain initial args")
     }
 
     private fun updateState(state: UiState) {
@@ -91,12 +99,15 @@ class ContactsRouteFragment : Fragment() {
 
     private fun drawIdleState(state: ContactsRouteState.Idle) = with(binding) {
         toolbar.title = getString(R.string.route)
+        contactsAdapter.items = state.contacts
         mapFragment?.getMapAsync { map ->
+            map.clear()
+            val route = state.route ?: return@getMapAsync
             map.addPolyline(
                 PolylineOptions()
-                    .addAll(state.route.points.map { it.toLatLng() })
+                    .addAll(route.points.map { it.toLatLng() })
             )
-            map.animateCameraToBounds(state.route.bounds)
+            map.animateCameraToBounds(route.bounds)
         }
     }
 
@@ -113,6 +124,6 @@ class ContactsRouteFragment : Fragment() {
             .include(bounds.northeast.toLatLng())
             .include(bounds.southwest.toLatLng())
             .build()
-        animateCamera(CameraUpdateFactory.newLatLngBounds(locationBounds, 100))
+        animateCamera(CameraUpdateFactory.newLatLngBounds(locationBounds, CAMERA_BOUNDS_PADDING))
     }
 }

@@ -51,7 +51,6 @@ dependencies {
     val appcompatVersion = "1.2.0"
     val fragmentVersion = "1.3.3"
     val lifecycleVersion = "2.3.1"
-    //val constraintLayoutVersion = "2.0.4"
     val swipeRefreshLayoutVersion = "1.1.0"
     val coordinatorLayoutVersion = "1.1.0"
     val materialVersion = "1.3.0"
@@ -72,7 +71,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion")
-    //implementation("androidx.constraintlayout:constraintlayout:$constraintLayoutVersion")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:$swipeRefreshLayoutVersion")
     implementation("androidx.coordinatorlayout:coordinatorlayout:$coordinatorLayoutVersion")
 

@@ -19,29 +19,25 @@ import androidx.lifecycle.lifecycleScope
 import com.example.fl0wer.R
 import com.example.fl0wer.androidApp.data.contacts.ContactParcelable
 import com.example.fl0wer.androidApp.di.App
+import com.example.fl0wer.androidApp.di.core.ViewModelFactory
 import com.example.fl0wer.androidApp.ui.UiState
+import com.example.fl0wer.androidApp.util.Const.BUNDLE_INITIAL_ARGS
 import com.example.fl0wer.databinding.FragmentContactDetailsBinding
 import com.example.fl0wer.databinding.IncludeContactDetailBinding
 import com.example.fl0wer.databinding.IncludeContactDetailMultilineBinding
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
+@Suppress("TooManyFunctions")
 class ContactDetailsFragment : Fragment() {
     @Inject
-    lateinit var viewModelFactory: ContactDetailsViewModelFactory
-    private val viewModel: ContactDetailsViewModel by viewModels {
-        ContactDetailsViewModel.provideFactory(
-            viewModelFactory,
-            arguments?.getString(ARGUMENT_CONTACT_ID) ?: "",
-        )
-    }
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: ContactDetailsViewModel by viewModels { viewModelFactory }
     private lateinit var binding: FragmentContactDetailsBinding
 
     companion object {
-        private const val ARGUMENT_CONTACT_ID = "ARGUMENT_CONTACT_ID"
-
-        fun newInstance(contactId: String) = ContactDetailsFragment().apply {
-            arguments = bundleOf(ARGUMENT_CONTACT_ID to contactId)
+        fun newInstance(params: ContactDetailsScreenParams) = ContactDetailsFragment().apply {
+            arguments = bundleOf(BUNDLE_INITIAL_ARGS to params)
         }
     }
 
@@ -81,6 +77,12 @@ class ContactDetailsFragment : Fragment() {
         }
     }
 
+    fun initialArguments(): ContactDetailsScreenParams {
+        arguments?.getParcelable<ContactDetailsScreenParams>(BUNDLE_INITIAL_ARGS)
+            ?.also { return it }
+        throw IllegalArgumentException("Fragment doesn't contain initial args")
+    }
+
     private fun updateState(state: UiState) {
         when (state) {
             is ContactDetailsState.Idle -> drawIdleState(state)
@@ -91,7 +93,7 @@ class ContactDetailsFragment : Fragment() {
 
     private fun drawIdleState(state: ContactDetailsState.Idle) = with(binding) {
         val contact = state.contact
-        val addressValue = state.location?.address ?: getString(R.string.not_specified)
+        val addressValue = state.location?.address ?: getString(R.string.set_location)
         loadingBar.isVisible = false
         scrollView.isVisible = true
         toolbar.title = contact.name
@@ -108,7 +110,7 @@ class ContactDetailsFragment : Fragment() {
         note.putDetail(contact.note, R.drawable.ic_note)
         birthdayLayout.putBirthday(contact, state.birthdayReminder)
         address.putDetail(addressValue, R.drawable.ic_location)
-        routes.isVisible = true
+        routes.isVisible = state.location != null
     }
 
     private fun drawLoadingState() = with(binding) {
@@ -153,30 +155,32 @@ class ContactDetailsFragment : Fragment() {
         }
     }
 
-    private fun RelativeLayout.putBirthday(contact: ContactParcelable, reminder: Boolean) =
-        with(binding) {
-            if (contact.birthdayMonth != -1 && contact.birthdayDayOfMonth != -1) {
-                isVisible = true
-                birthday.putDetail(
-                    getString(
-                        R.string.birthday_value,
-                        contact.birthdayMonth,
-                        contact.birthdayDayOfMonth,
-                    ),
-                    R.string.birthday,
-                    R.drawable.ic_event,
+    private fun RelativeLayout.putBirthday(
+        contact: ContactParcelable,
+        reminder: Boolean,
+    ) = with(binding) {
+        if (contact.birthdayMonth != -1 && contact.birthdayDayOfMonth != -1) {
+            isVisible = true
+            birthday.putDetail(
+                getString(
+                    R.string.birthday_value,
+                    contact.birthdayMonth,
+                    contact.birthdayDayOfMonth,
+                ),
+                R.string.birthday,
+                R.drawable.ic_event,
+            )
+            if (reminder) {
+                birthdayReminder.setImageResource(R.drawable.ic_notifications_active)
+                birthdayReminder.setColorFilter(
+                    ResourcesCompat.getColor(resources, R.color.teal_500, null)
                 )
-                if (reminder) {
-                    birthdayReminder.setImageResource(R.drawable.ic_notifications_active)
-                    birthdayReminder.setColorFilter(
-                        ResourcesCompat.getColor(resources, R.color.teal_500, null)
-                    )
-                } else {
-                    birthdayReminder.setImageResource(R.drawable.ic_notifications_none)
-                    birthdayReminder.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN)
-                }
             } else {
-                isVisible = false
+                birthdayReminder.setImageResource(R.drawable.ic_notifications_none)
+                birthdayReminder.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN)
             }
+        } else {
+            isVisible = false
         }
+    }
 }
