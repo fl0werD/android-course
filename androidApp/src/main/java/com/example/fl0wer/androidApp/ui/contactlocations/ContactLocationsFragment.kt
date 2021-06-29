@@ -1,16 +1,13 @@
 package com.example.fl0wer.androidApp.ui.contactlocations
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.fl0wer.R
 import com.example.fl0wer.androidApp.data.locations.LocationParcelable
-import com.example.fl0wer.androidApp.di.App
 import com.example.fl0wer.androidApp.di.core.ViewModelFactory
 import com.example.fl0wer.androidApp.ui.UiState
 import com.example.fl0wer.databinding.FragmentContactLocationsBinding
@@ -20,12 +17,13 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.ktx.addMarker
+import dagger.android.support.DaggerFragment
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
 private const val CAMERA_BOUNDS_PADDING = 100
 
-class ContactLocationsFragment : Fragment() {
+class ContactLocationsFragment : DaggerFragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     private val viewModel: ContactLocationsViewModel by viewModels { viewModelFactory }
@@ -34,11 +32,6 @@ class ContactLocationsFragment : Fragment() {
 
     companion object {
         fun newInstance() = ContactLocationsFragment()
-    }
-
-    override fun onAttach(context: Context) {
-        (requireActivity().application as App).appComponent.inject(this)
-        super.onAttach(context)
     }
 
     override fun onCreateView(

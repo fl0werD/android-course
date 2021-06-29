@@ -16,7 +16,6 @@ import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 
-@Suppress("SwallowedException")
 class ContactLocationsViewModel @Inject constructor(
     private val locationInteractor: LocationInteractor,
     private val modo: Modo,
@@ -43,7 +42,7 @@ class ContactLocationsViewModel @Inject constructor(
                 val locations = locationInteractor.locations()
                 _uiState.value = ContactLocationsState.Idle(locations.toParcelable())
             } catch (e: IOException) {
-                // _uiState.value = ContactLocationsState.Failure
+                Timber.e(e)
             }
         }
     }

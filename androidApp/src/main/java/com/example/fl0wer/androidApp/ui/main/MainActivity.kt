@@ -6,28 +6,31 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import com.example.fl0wer.androidApp.di.App
-import com.example.fl0wer.androidApp.util.Const
 import com.example.fl0wer.R
+import com.example.fl0wer.androidApp.di.core.ViewModelFactory
 import com.example.fl0wer.androidApp.ui.core.navigation.Screens
+import com.example.fl0wer.androidApp.util.Const
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.android.ModoRender
 import com.github.terrakok.modo.android.init
 import com.github.terrakok.modo.android.saveState
 import com.github.terrakok.modo.back
+import dagger.android.support.DaggerAppCompatActivity
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity(R.layout.activity_main) {
+class MainActivity : DaggerAppCompatActivity(R.layout.activity_main) {
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private val viewModel: MainViewModel by viewModels { viewModelFactory }
+
     @Inject
     lateinit var modo: Modo
     private val modoRender by lazy { ModoRender(this, R.id.fragments_container) }
-    private val viewModel: MainViewModel by viewModels()
 
     private val readContactsPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
+    ) { granted ->
+        if (granted) {
             handleIntent(intent)
         } else {
             showPermissionRationaleDialog()
@@ -35,7 +38,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        (application as App).appComponent.inject(this)
         super.onCreate(savedInstanceState)
         modo.init(savedInstanceState, Screens.ContactList())
         if (savedInstanceState == null) {

@@ -26,9 +26,9 @@
         android:layout_height="match_parent" />
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/bottom_sheet_card"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="96dp"
+        android:layout_height="600dp"
         app:behavior_hideable="false"
         app:behavior_peekHeight="176dp"
         app:cardCornerRadius="24dp"

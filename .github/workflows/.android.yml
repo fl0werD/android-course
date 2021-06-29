@@ -14,6 +14,8 @@ jobs:
           distribution: "adopt"
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
+      - name: Create local.properties file
+        run: echo "MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}" > local.properties
       - name: Build
         run: ./gradlew build
   linters:

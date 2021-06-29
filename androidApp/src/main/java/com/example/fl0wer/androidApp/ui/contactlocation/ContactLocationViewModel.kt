@@ -1,5 +1,3 @@
-@file:Suppress("WildcardImport")
-
 package com.example.fl0wer.androidApp.ui.contactlocation
 
 import androidx.lifecycle.ViewModel
@@ -13,7 +11,11 @@ import com.github.terrakok.modo.back
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import timber.log.Timber
@@ -55,9 +57,18 @@ class ContactLocationViewModel @Inject constructor(
     private fun subscribeLocation(contact: Int) = vmScope.launch {
         locationInteractor.observeLocation(contact)
             .map {
-                ContactLocationState.Idle(
-                    location = it?.toParcelable()
-                )
+                val currentState = uiState.value
+                if (currentState is ContactLocationState.Idle) {
+                    currentState.copy(
+                        firstEntryZoom = false,
+                        location = it?.toParcelable()
+                    )
+                } else {
+                    ContactLocationState.Idle(
+                        firstEntryZoom = true,
+                        location = it?.toParcelable()
+                    )
+                }
             }
             .flowOn(dispatchersProvider.io)
             .collect { newState ->

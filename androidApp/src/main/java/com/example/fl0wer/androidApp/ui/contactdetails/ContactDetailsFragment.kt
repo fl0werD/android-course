@@ -1,6 +1,5 @@
 package com.example.fl0wer.androidApp.ui.contactdetails
 
-import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
@@ -13,23 +12,21 @@ import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.fl0wer.R
 import com.example.fl0wer.androidApp.data.contacts.ContactParcelable
-import com.example.fl0wer.androidApp.di.App
 import com.example.fl0wer.androidApp.di.core.ViewModelFactory
 import com.example.fl0wer.androidApp.ui.UiState
 import com.example.fl0wer.androidApp.util.Const.BUNDLE_INITIAL_ARGS
 import com.example.fl0wer.databinding.FragmentContactDetailsBinding
 import com.example.fl0wer.databinding.IncludeContactDetailBinding
 import com.example.fl0wer.databinding.IncludeContactDetailMultilineBinding
+import dagger.android.support.DaggerFragment
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
-@Suppress("TooManyFunctions")
-class ContactDetailsFragment : Fragment() {
+class ContactDetailsFragment : DaggerFragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     private val viewModel: ContactDetailsViewModel by viewModels { viewModelFactory }
@@ -39,11 +36,6 @@ class ContactDetailsFragment : Fragment() {
         fun newInstance(params: ContactDetailsScreenParams) = ContactDetailsFragment().apply {
             arguments = bundleOf(BUNDLE_INITIAL_ARGS to params)
         }
-    }
-
-    override fun onAttach(context: Context) {
-        (requireActivity().application as App).appComponent.inject(this)
-        super.onAttach(context)
     }
 
     override fun onCreateView(
@@ -96,7 +88,7 @@ class ContactDetailsFragment : Fragment() {
         val addressValue = state.location?.address ?: getString(R.string.set_location)
         loadingBar.isVisible = false
         scrollView.isVisible = true
-        toolbar.title = contact.name
+        toolbar.title = ""
         if (contact.photo == 0) {
             photo.setImageResource(R.drawable.ic_contact)
         } else {
@@ -147,9 +139,9 @@ class ContactDetailsFragment : Fragment() {
     ) {
         if (value.isNotEmpty()) {
             root.isVisible = true
-            detailIcon.setImageResource(icon)
-            detailValue.text = value
-            detailDesc.text = getString(desc)
+            detailsIcon.setImageResource(icon)
+            detailsValue.text = value
+            detailsDesc.text = getString(desc)
         } else {
             root.isVisible = false
         }

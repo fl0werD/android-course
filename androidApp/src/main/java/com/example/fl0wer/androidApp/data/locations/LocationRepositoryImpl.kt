@@ -24,12 +24,6 @@ class LocationRepositoryImpl(
         }
     }
 
-    /*override suspend fun location(contactId: Int): Location? {
-        return locationDao.loadLocation(contactId).map {
-            it?.toLocation()
-        }
-    }*/
-
     override suspend fun locations(): List<Location> =
         withContext(dispatchersProvider.io) {
             locationDao.loadLocations().toLocation()

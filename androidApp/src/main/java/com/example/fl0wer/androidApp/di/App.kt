@@ -1,18 +1,18 @@
 package com.example.fl0wer.androidApp.di
 
-import android.app.Application
 import com.example.fl0wer.BuildConfig
+import dagger.android.AndroidInjector
+import dagger.android.DaggerApplication
 import timber.log.Timber
 
-class App : Application() {
-    lateinit var appComponent: AppComponent
-        private set
-
+class App : DaggerApplication() {
     override fun onCreate() {
         super.onCreate()
-        appComponent = DaggerAppComponent.factory().create(applicationContext)
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
     }
+
+    override fun applicationInjector(): AndroidInjector<out DaggerApplication> =
+        DaggerAppComponent.factory().create(applicationContext)
 }

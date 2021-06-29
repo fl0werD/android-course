@@ -10,6 +10,7 @@ sealed class ContactLocationState : UiState {
 
     @Parcelize
     data class Idle(
+        val firstEntryZoom: Boolean = true,
         val location: LocationParcelable? = null,
     ) : ContactLocationState()
 }

@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.fl0wer.androidApp.data.contacts.ContactMapper.toParcelable
 import com.example.fl0wer.androidApp.data.directions.toParcelable
 import com.example.fl0wer.androidApp.ui.contactlist.adapter.ContactListItem
-import com.example.fl0wer.androidApp.ui.nullOr
 import com.example.fl0wer.domain.contacts.Contact
 import com.example.fl0wer.domain.contacts.ContactsInteractor
 import com.example.fl0wer.domain.core.Result
@@ -24,7 +23,6 @@ import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 
-@Suppress("SwallowedException")
 class ContactsRouteViewModel @Inject constructor(
     private val contactsInteractor: ContactsInteractor,
     private val locationInteractor: LocationInteractor,
@@ -32,7 +30,7 @@ class ContactsRouteViewModel @Inject constructor(
     private val modo: Modo,
     private val screenParams: ContactsRouteScreenParams,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow<ContactsRouteState>(ContactsRouteState.Loading)
+    private val _uiState = MutableStateFlow(ContactsRouteState())
     val uiState get() = _uiState.asStateFlow()
     private val vmScope = viewModelScope + CoroutineExceptionHandler { _, e ->
         if (e !is CancellationException) {
@@ -45,58 +43,69 @@ class ContactsRouteViewModel @Inject constructor(
     }
 
     fun contactClicked(position: Int) {
-        val currentState = uiState.value.nullOr<ContactsRouteState.Idle>() ?: return
-        val endContactId = (currentState.contacts[position] as ContactListItem.Contact).contact.id
-        buildRoute(screenParams.startContactId, endContactId)
+        val contactItem = uiState.value.contacts.getOrNull(position) ?: return
+        if (contactItem !is ContactListItem.Contact) {
+            return
+        }
+        buildRoute(screenParams.startContactId, contactItem.contact.id)
     }
 
     fun backPressed() {
         modo.back()
     }
 
+    private fun loadContacts() {
+        vmScope.launch {
+            _uiState.value = uiState.value.copy(loading = true)
+            try {
+                val contacts = contactsInteractor.contactsWithAddress(screenParams.startContactId)
+                _uiState.value = uiState.value.copy(
+                    loading = false,
+                    contacts = contacts.toListItems(),
+                    error = null,
+                )
+            } catch (e: IOException) {
+                Timber.e(e)
+                _uiState.value = uiState.value.copy(
+                    loading = false,
+                    error = e,
+                )
+            }
+        }
+    }
+
     private fun buildRoute(startContactId: Int, endContactId: Int) {
         vmScope.launch {
-            // _uiState.value = ContactsRouteState.Loading
+            _uiState.value = uiState.value.copy(
+                loading = true,
+                error = null,
+            )
             try {
                 val start = locationInteractor.observeLocation(startContactId).first()
                 val end = locationInteractor.observeLocation(endContactId).first()
                 if (start != null && end != null) {
                     when (val route = directionInteractor.route(start.address, end.address)) {
                         is Result.Success -> {
-                            val currentState = uiState.value
-                            val contacts = if (currentState is ContactsRouteState.Idle) {
-                                currentState.contacts
-                            } else {
-                                emptyList()
-                            }
-                            _uiState.value = ContactsRouteState.Idle(
+                            _uiState.value = uiState.value.copy(
+                                loading = false,
                                 route = route.value.toParcelable(),
-                                contacts = contacts,
+                                error = null,
                             )
                         }
                         is Result.Failure -> {
-                            _uiState.value = ContactsRouteState.RouteNotFound
+                            _uiState.value = uiState.value.copy(
+                                loading = false,
+                                error = route.throwable,
+                            )
                         }
                     }
-                } else {
-                    _uiState.value = ContactsRouteState.EmptyAddress
                 }
             } catch (e: IOException) {
                 Timber.e(e)
-            }
-        }
-    }
-
-    private fun loadContacts() {
-        vmScope.launch {
-            _uiState.value = ContactsRouteState.Loading
-            try {
-                val contacts = contactsInteractor.contactsWithAddress(screenParams.startContactId)
-                _uiState.value = ContactsRouteState.Idle(
-                    contacts = contacts.toListItems()
+                _uiState.value = uiState.value.copy(
+                    loading = false,
+                    error = null,
                 )
-            } catch (e: IOException) {
-                // _uiState.value = ContactsRouteState.Failure
             }
         }
     }

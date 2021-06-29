@@ -20,7 +20,6 @@ import java.io.IOException
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
-@Suppress("SwallowedException")
 class ContactListViewModel @Inject constructor(
     private val contactsInteractor: ContactsInteractor,
     private val modo: Modo,
@@ -65,6 +64,7 @@ class ContactListViewModel @Inject constructor(
                 val contacts = contactsInteractor.contacts(reload)
                 _uiState.value = ContactListState.Idle(contacts.toListItems())
             } catch (e: IOException) {
+                Timber.e(e)
                 _uiState.value = ContactListState.Failure
             }
         }
@@ -77,6 +77,7 @@ class ContactListViewModel @Inject constructor(
                 val contacts = contactsInteractor.search(nameFilter)
                 _uiState.value = ContactListState.Idle(contacts.toListItems())
             } catch (e: IOException) {
+                Timber.e(e)
                 _uiState.value = ContactListState.Failure
             }
         }

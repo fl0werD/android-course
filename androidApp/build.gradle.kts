@@ -3,7 +3,7 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     id("kotlin-parcelize")
-    id("com.google.secrets_gradle_plugin").version("0.5")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -48,7 +48,7 @@ dependencies {
 
     val daggerVersion = properties["dagger_version"]
     val coreVersion = "1.3.2"
-    val appcompatVersion = "1.2.0"
+    val appcompatVersion = "1.3.0"
     val fragmentVersion = "1.3.3"
     val lifecycleVersion = "2.3.1"
     val swipeRefreshLayoutVersion = "1.1.0"
@@ -64,6 +64,9 @@ dependencies {
 
     implementation("com.google.dagger:dagger:$daggerVersion")
     kapt("com.google.dagger:dagger-compiler:$daggerVersion")
+    implementation("com.google.dagger:dagger-android:$daggerVersion")
+    implementation("com.google.dagger:dagger-android-support:$daggerVersion")
+    kapt("com.google.dagger:dagger-android-processor:$daggerVersion")
 
     implementation("androidx.core:core-ktx:$coreVersion")
     implementation("androidx.appcompat:appcompat:$appcompatVersion")
@@ -95,4 +98,9 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test:runner:1.3.0")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
+}
+
+secrets {
+    propertiesFileName = "secrets.properties"
+    defaultPropertiesFileName = "secrets.defaults.properties"
 }

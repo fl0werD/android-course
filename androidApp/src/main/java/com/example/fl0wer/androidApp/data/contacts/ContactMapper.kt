@@ -31,7 +31,5 @@ object ContactMapper {
         note = note,
     )
 
-    fun List<Contact>.toParcelable(): List<ContactParcelable> = map { it.toParcelable() }
-
     fun List<ContactParcelable>.toContact(): List<Contact> = map { it.toContact() }
 }

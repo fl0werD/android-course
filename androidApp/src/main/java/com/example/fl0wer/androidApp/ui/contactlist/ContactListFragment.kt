@@ -1,27 +1,25 @@
 package com.example.fl0wer.androidApp.ui.contactlist
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.fl0wer.R
-import com.example.fl0wer.androidApp.di.App
 import com.example.fl0wer.androidApp.di.core.ViewModelFactory
 import com.example.fl0wer.androidApp.ui.UiState
 import com.example.fl0wer.androidApp.ui.contactlist.adapter.ContactsAdapter
 import com.example.fl0wer.androidApp.ui.contactlist.adapter.contactItemDecorator
 import com.example.fl0wer.databinding.FragmentContactListBinding
-import javax.inject.Inject
+import dagger.android.support.DaggerFragment
 import kotlinx.coroutines.flow.collect
+import javax.inject.Inject
 
-class ContactListFragment : Fragment() {
+class ContactListFragment : DaggerFragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     private val viewModel: ContactListViewModel by viewModels { viewModelFactory }
@@ -34,11 +32,6 @@ class ContactListFragment : Fragment() {
 
     companion object {
         fun newInstance() = ContactListFragment()
-    }
-
-    override fun onAttach(context: Context) {
-        (requireActivity().application as App).appComponent.inject(this)
-        super.onAttach(context)
     }
 
     override fun onCreateView(

@@ -1,28 +1,29 @@
 package com.example.fl0wer.androidApp.ui.contactlocation
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.fl0wer.R
-import com.example.fl0wer.androidApp.di.App
 import com.example.fl0wer.androidApp.di.core.ViewModelFactory
 import com.example.fl0wer.androidApp.ui.UiState
 import com.example.fl0wer.androidApp.util.Const.BUNDLE_INITIAL_ARGS
 import com.example.fl0wer.databinding.FragmentContactLocationBinding
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.ktx.addMarker
+import dagger.android.support.DaggerFragment
 import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
-class ContactLocationFragment : Fragment() {
+private const val CAMERA_ZOOM = 10F
+
+class ContactLocationFragment : DaggerFragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     private val viewModel: ContactLocationViewModel by viewModels { viewModelFactory }
@@ -34,11 +35,6 @@ class ContactLocationFragment : Fragment() {
         fun newInstance(params: ContactLocationScreenParams) = ContactLocationFragment().apply {
             arguments = bundleOf(BUNDLE_INITIAL_ARGS to params)
         }
-    }
-
-    override fun onAttach(context: Context) {
-        (requireActivity().application as App).appComponent.inject(this)
-        super.onAttach(context)
     }
 
     override fun onCreateView(
@@ -90,9 +86,13 @@ class ContactLocationFragment : Fragment() {
         toolbar.title = getString(R.string.contact_location)
         state.location?.apply {
             mapFragment?.getMapAsync {
+                val location = LatLng(latitude, longitude)
                 mapMarker?.remove()
                 mapMarker = it.addMarker {
-                    position(LatLng(latitude, longitude))
+                    position(location)
+                }
+                if (state.firstEntryZoom) {
+                    it.moveCamera(CameraUpdateFactory.newLatLngZoom(location, CAMERA_ZOOM))
                 }
             }
         }

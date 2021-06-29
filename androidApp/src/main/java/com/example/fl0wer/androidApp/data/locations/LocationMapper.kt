@@ -18,13 +18,6 @@ object LocationMapper {
         address = address,
     )
 
-    fun LocationParcelable.toLocation() = Location(
-        id = id,
-        latitude = latitude,
-        longitude = longitude,
-        address = address,
-    )
-
     fun LocationEntity.toLocation() = Location(
         id = id,
         latitude = latitude,
@@ -33,9 +26,6 @@ object LocationMapper {
     )
 
     fun List<Location>.toParcelable(): List<LocationParcelable> = map { it.toParcelable() }
-
-    /*@JvmName("toLocationLocationParcelable")
-    fun List<LocationParcelable>.toLocation(): List<Location> = map { it.toLocation() }*/
 
     fun List<LocationEntity>.toLocation(): List<Location> = map { it.toLocation() }
 }

@@ -2,7 +2,6 @@ package com.example.fl0wer.androidApp.data.contacts.receiver
 
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_ONE_SHOT
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
@@ -12,14 +11,14 @@ import com.example.fl0wer.androidApp.util.Const.RECEIVER_INTENT_ACTION_CONTACT_B
 import com.example.fl0wer.R
 import com.example.fl0wer.domain.contacts.ContactsInteractor
 import com.example.fl0wer.domain.core.dispatchers.DispatchersProvider
-import com.example.fl0wer.androidApp.di.App
 import com.example.fl0wer.androidApp.ui.main.MainActivity
 import com.example.fl0wer.androidApp.util.sendNotification
+import dagger.android.DaggerBroadcastReceiver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ContactBroadcastReceiver : BroadcastReceiver() {
+class ContactBroadcastReceiver : DaggerBroadcastReceiver() {
     @Inject
     lateinit var appScope: CoroutineScope
     @Inject
@@ -28,10 +27,10 @@ class ContactBroadcastReceiver : BroadcastReceiver() {
     lateinit var contactsInteractor: ContactsInteractor
 
     override fun onReceive(context: Context?, intent: Intent?) {
+        super.onReceive(context, intent)
         if (context == null || intent == null) {
             return
         }
-        (context as App).appComponent.inject(this)
         if (intent.action == RECEIVER_INTENT_ACTION_CONTACT_BIRTHDAY) {
             val contactId = intent.getStringExtra(NOTICE_BIRTHDAY_EXTRA_CONTACT_ID)
 

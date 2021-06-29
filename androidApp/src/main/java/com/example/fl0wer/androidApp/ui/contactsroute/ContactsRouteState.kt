@@ -5,19 +5,10 @@ import com.example.fl0wer.androidApp.ui.UiState
 import com.example.fl0wer.androidApp.ui.contactlist.adapter.ContactListItem
 import kotlinx.parcelize.Parcelize
 
-sealed class ContactsRouteState : UiState {
-    @Parcelize
-    object Loading : ContactsRouteState()
-
-    @Parcelize
-    data class Idle(
-        val route: RouteParcelable? = null,
-        val contacts: List<ContactListItem>,
-    ) : ContactsRouteState()
-
-    @Parcelize
-    object EmptyAddress : ContactsRouteState()
-
-    @Parcelize
-    object RouteNotFound : ContactsRouteState()
-}
+@Parcelize
+data class ContactsRouteState(
+    val loading: Boolean = false,
+    val route: RouteParcelable? = null,
+    val contacts: List<ContactListItem> = mutableListOf(),
+    val error: Throwable? = null,
+) : UiState

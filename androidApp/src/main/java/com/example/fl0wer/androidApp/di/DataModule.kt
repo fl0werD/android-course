@@ -22,7 +22,7 @@ import com.example.fl0wer.domain.locations.LocationInteractorImpl
 import com.example.fl0wer.domain.locations.LocationRepository
 import dagger.Module
 import dagger.Provides
-import java.util.*
+import java.util.GregorianCalendar
 import javax.inject.Singleton
 
 @Module

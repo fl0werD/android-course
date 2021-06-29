@@ -7,6 +7,7 @@ buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:${properties["version.androidGradlePlugin"]}")
         classpath(kotlin("gradle-plugin:${properties["version.kotlin"]}"))
+        classpath("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:${properties["version.secretsGradlePlugin"]}")
     }
 }
 

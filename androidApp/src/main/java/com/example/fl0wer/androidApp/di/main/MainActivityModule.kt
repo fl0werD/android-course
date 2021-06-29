@@ -8,11 +8,10 @@ import dagger.Module
 import dagger.multibindings.IntoMap
 
 @Module(includes = [MainActivityModule.ViewModelModule::class])
-class MainActivityModule {
-
+interface MainActivityModule {
     @Module
     interface ViewModelModule {
         @[Binds IntoMap ViewModelKey(MainViewModel::class)]
-        fun bindViewModel(viewModel: MainViewModel): ViewModel
+        fun provideMainViewModel(viewModel: MainViewModel): ViewModel
     }
 }

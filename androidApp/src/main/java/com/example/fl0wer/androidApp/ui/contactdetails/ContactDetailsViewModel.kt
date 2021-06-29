@@ -1,5 +1,3 @@
-@file:Suppress("WildcardImport")
-
 package com.example.fl0wer.androidApp.ui.contactdetails
 
 import androidx.lifecycle.ViewModel
@@ -17,16 +15,19 @@ import com.example.fl0wer.domain.locations.LocationInteractor
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.back
 import com.github.terrakok.modo.forward
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
-import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
+import timber.log.Timber
 
-@Suppress("SwallowedException")
 class ContactDetailsViewModel @Inject constructor(
     private val contactsInteractor: ContactsInteractor,
     private val reminderInteractor: ReminderInteractor,
@@ -57,6 +58,7 @@ class ContactDetailsViewModel @Inject constructor(
                     birthdayReminder = reminderInteractor.birthdayReminder(contact)
                 )
             } catch (e: IOException) {
+                Timber.e(e)
                 _uiState.value = ContactDetailsState.Failure
             }
         }
@@ -92,6 +94,7 @@ class ContactDetailsViewModel @Inject constructor(
                     _uiState.value = ContactDetailsState.Failure
                 }
             } catch (e: IOException) {
+                Timber.e(e)
                 _uiState.value = ContactDetailsState.Failure
             }
         }
