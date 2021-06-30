@@ -32,10 +32,6 @@ class ContactListViewModel @Inject constructor(
         }
     }
 
-    init {
-        loadContacts()
-    }
-
     fun contactClicked(position: Int) {
         val currentState = uiState.value.nullOr<ContactListState.Idle>() ?: return
         val contactList = (currentState.contacts[position] as? ContactListItem.Contact) ?: return
@@ -57,7 +53,7 @@ class ContactListViewModel @Inject constructor(
         searchContacts(nameFilter)
     }
 
-    private fun loadContacts(reload: Boolean = false) {
+    fun loadContacts(reload: Boolean = false) {
         vmScope.launch {
             _uiState.value = ContactListState.Loading
             try {

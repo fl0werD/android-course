@@ -9,7 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import com.example.fl0wer.R
 import com.example.fl0wer.androidApp.di.core.ViewModelFactory
 import com.example.fl0wer.androidApp.ui.core.navigation.Screens
-import com.example.fl0wer.androidApp.util.Const
+import com.example.fl0wer.androidApp.util.Const.NOTICE_BIRTHDAY_EXTRA_CONTACT_ID
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.android.ModoRender
 import com.github.terrakok.modo.android.init
@@ -40,9 +40,7 @@ class MainActivity : DaggerAppCompatActivity(R.layout.activity_main) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         modo.init(savedInstanceState, Screens.ContactList())
-        if (savedInstanceState == null) {
-            readContactsPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
-        }
+        readContactsPermissionLauncher.launch(Manifest.permission.READ_CONTACTS)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -70,7 +68,7 @@ class MainActivity : DaggerAppCompatActivity(R.layout.activity_main) {
     }
 
     private fun handleIntent(intent: Intent) {
-        val contactId = intent.getStringExtra(Const.NOTICE_BIRTHDAY_EXTRA_CONTACT_ID) ?: return
+        val contactId = intent.getStringExtra(NOTICE_BIRTHDAY_EXTRA_CONTACT_ID) ?: return
         viewModel.openContact(contactId)
     }
 
