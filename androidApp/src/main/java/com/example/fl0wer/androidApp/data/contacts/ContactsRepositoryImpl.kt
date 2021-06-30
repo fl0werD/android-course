@@ -6,7 +6,7 @@ import android.net.Uri
 import android.provider.ContactsContract
 import com.example.fl0wer.androidApp.domain.contacts.Contact
 import com.example.fl0wer.androidApp.domain.contacts.ContactsRepository
-import com.example.fl0wer.androidApp.domain.core.dispatchers.DispatchersProvider
+import com.example.fl0wer.androidApp.ui.core.dispatchers.DispatchersProvider
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.GregorianCalendar
@@ -19,26 +19,26 @@ class ContactsRepositoryImpl(
 ) : ContactsRepository {
     private val contacts = mutableListOf<Contact>()
 
-    override fun contacts(): List<Contact> = contacts
-
-    override suspend fun loadContacts() =
-        withContext(dispatchersProvider.default) {
-            contacts.clear()
-            context.contentResolver.query(
-                ContactsContract.Contacts.CONTENT_URI,
-                arrayOf(
-                    ContactsContract.Contacts._ID,
-                    ContactsContract.Data.LOOKUP_KEY,
-                    ContactsContract.Data.DISPLAY_NAME_PRIMARY,
-                ),
-                null,
-                null,
-                null,
-            )?.use {
-                while (it.moveToNext()) {
-                    val contact = handleContact(it)
-                    if (contact != null) {
-                        contacts.add(contact)
+    override suspend fun contacts(forceUpdate: Boolean) =
+        withContext(dispatchersProvider.io) {
+            if (contacts.isEmpty() || forceUpdate) {
+                contacts.clear()
+                context.contentResolver.query(
+                    ContactsContract.Contacts.CONTENT_URI,
+                    arrayOf(
+                        ContactsContract.Contacts._ID,
+                        ContactsContract.Data.LOOKUP_KEY,
+                        ContactsContract.Data.DISPLAY_NAME_PRIMARY,
+                    ),
+                    null,
+                    null,
+                    null,
+                )?.use {
+                    while (it.moveToNext()) {
+                        val contact = handleContact(it)
+                        if (contact != null) {
+                            contacts.add(contact)
+                        }
                     }
                 }
             }
@@ -46,7 +46,7 @@ class ContactsRepositoryImpl(
         }
 
     override suspend fun contact(lookupKey: String) =
-        withContext(dispatchersProvider.default) {
+        withContext(dispatchersProvider.io) {
             if (contacts.isNotEmpty()) {
                 return@withContext contacts.firstOrNull {
                     it.lookupKey == lookupKey

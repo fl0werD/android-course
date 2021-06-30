@@ -2,27 +2,30 @@ package com.example.fl0wer.androidApp.data.directions
 
 import com.example.fl0wer.androidApp.data.core.network.GoogleApi
 import com.example.fl0wer.androidApp.domain.core.Result
+import com.example.fl0wer.androidApp.ui.core.dispatchers.DispatchersProvider
 import com.example.fl0wer.androidApp.domain.directions.DirectionRepository
 import com.example.fl0wer.androidApp.domain.directions.Route
 import com.example.fl0wer.androidApp.domain.locations.LatLon
 import com.google.maps.android.PolyUtil
 import java.io.IOException
+import kotlinx.coroutines.withContext
 
 class DirectionRepositoryImpl(
     private val googleApi: GoogleApi,
+    private val dispatchersProvider: DispatchersProvider,
 ) : DirectionRepository {
     @Suppress("ReturnCount")
     override suspend fun getRoute(
         origin: String,
         destination: String,
-    ): Result<Route> {
+    ) = withContext(dispatchersProvider.io) {
         val response = googleApi.getRoute(origin, destination)
         if (response.status != "OK") {
-            return Result.Failure(IOException("Status not OK"))
+            return@withContext Result.Failure(IOException("Status not OK"))
         }
         val route = response.routes.firstOrNull()
         if (route == null) {
-            return Result.Failure(IOException("No routes"))
+            return@withContext Result.Failure(IOException("No routes"))
         }
         val points = response.routes
             .firstOrNull()
@@ -37,9 +40,9 @@ class DirectionRepositoryImpl(
                 )
             }
         if (points == null) {
-            return Result.Failure(IOException("No points"))
+            return@withContext Result.Failure(IOException("No points"))
         }
-        return Result.Success(
+        Result.Success(
             Route(route.bounds.toBound(), points)
         )
     }

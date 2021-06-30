@@ -13,7 +13,7 @@ import com.example.fl0wer.androidApp.domain.contacts.ContactsRepository
 import com.example.fl0wer.androidApp.domain.contacts.ReminderInteractor
 import com.example.fl0wer.androidApp.domain.contacts.ReminderInteractorImpl
 import com.example.fl0wer.androidApp.domain.contacts.ReminderRepository
-import com.example.fl0wer.androidApp.domain.core.dispatchers.DispatchersProvider
+import com.example.fl0wer.androidApp.ui.core.dispatchers.DispatchersProvider
 import com.example.fl0wer.androidApp.domain.directions.DirectionInteractor
 import com.example.fl0wer.androidApp.domain.directions.DirectionInteractorImpl
 import com.example.fl0wer.androidApp.domain.directions.DirectionRepository
@@ -40,24 +40,30 @@ object DataModule {
     fun bindContactsInteractor(
         contactsRepository: ContactsRepository,
         locationRepository: LocationRepository,
+        dispatchersProvider: DispatchersProvider,
     ): ContactsInteractor = ContactsInteractorImpl(
         contactsRepository,
         locationRepository,
+        dispatchersProvider,
     )
 
     @[Provides Singleton]
     fun bindReminderRepository(
         context: Context,
+        dispatchersProvider: DispatchersProvider,
     ): ReminderRepository = ReminderRepositoryImpl(
         context,
+        dispatchersProvider,
     )
 
     @[Provides Singleton]
     fun bindReminderInteractor(
         reminderRepository: ReminderRepository,
+        dispatchersProvider: DispatchersProvider,
     ): ReminderInteractor = ReminderInteractorImpl(
         reminderRepository,
         GregorianCalendar(),
+        dispatchersProvider,
     )
 
     @[Provides Singleton]
@@ -83,8 +89,10 @@ object DataModule {
     @[Provides Singleton]
     fun bindDirectionRepository(
         googleApi: GoogleApi,
+        dispatchersProvider: DispatchersProvider,
     ): DirectionRepository = DirectionRepositoryImpl(
         googleApi,
+        dispatchersProvider,
     )
 
     @[Provides Singleton]

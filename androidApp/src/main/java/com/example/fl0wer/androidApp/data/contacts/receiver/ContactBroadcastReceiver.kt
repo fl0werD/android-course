@@ -10,7 +10,7 @@ import com.example.fl0wer.androidApp.util.Const.NOTIFICATION_CHANNEL_ID
 import com.example.fl0wer.androidApp.util.Const.RECEIVER_INTENT_ACTION_CONTACT_BIRTHDAY
 import com.example.fl0wer.R
 import com.example.fl0wer.androidApp.domain.contacts.ContactsInteractor
-import com.example.fl0wer.androidApp.domain.core.dispatchers.DispatchersProvider
+import com.example.fl0wer.androidApp.ui.core.dispatchers.DispatchersProvider
 import com.example.fl0wer.androidApp.ui.main.MainActivity
 import com.example.fl0wer.androidApp.util.sendNotification
 import dagger.android.DaggerBroadcastReceiver

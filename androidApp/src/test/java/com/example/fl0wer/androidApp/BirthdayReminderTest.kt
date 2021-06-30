@@ -3,16 +3,19 @@ package com.example.fl0wer.androidApp
 import com.example.fl0wer.androidApp.domain.contacts.Contact
 import com.example.fl0wer.androidApp.domain.contacts.ReminderInteractorImpl
 import com.example.fl0wer.androidApp.domain.contacts.ReminderRepository
+import com.example.fl0wer.androidApp.ui.core.dispatchers.DispatchersProvider
+import com.example.fl0wer.androidApp.ui.core.dispatchers.DispatchersProviderImpl
+import java.util.GregorianCalendar
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.mockito.kotlin.argWhere
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import java.util.GregorianCalendar
 
 class BirthdayReminderTest {
     private val reminderRepository: ReminderRepository = mock()
+    private val dispatchersProvider: DispatchersProvider = DispatchersProviderImpl
 
     private val ivanIvanovich = Contact(
         1,
@@ -34,15 +37,17 @@ class BirthdayReminderTest {
     )
 
     @Test
-    fun add_CurrentDateAfterBirthdayWithoutReminder_ToNextYear() {
+    fun add_CurrentDateAfterBirthdayWithoutReminder_ToNextYear() = runBlocking {
         val currentDate = GregorianCalendar().apply {
             set(1999, GregorianCalendar.SEPTEMBER, 9)
         }
-        val reminderInteractor = ReminderInteractorImpl(reminderRepository, currentDate)
+        val reminderInteractor = ReminderInteractorImpl(
+            reminderRepository,
+            currentDate,
+            dispatchersProvider
+        )
 
-        runBlocking {
-            reminderInteractor.addBirthdayReminder(ivanIvanovich)
-        }
+        reminderInteractor.addBirthdayReminder(ivanIvanovich)
 
         verify(reminderRepository).addBirthdayReminder(
             eq(ivanIvanovich),
@@ -55,15 +60,17 @@ class BirthdayReminderTest {
     }
 
     @Test
-    fun add_CurrentDateBeforeBirthdayWithoutReminder_ToCurrentYear() {
+    fun add_CurrentDateBeforeBirthdayWithoutReminder_ToCurrentYear() = runBlocking {
         val currentDate = GregorianCalendar().apply {
             set(1999, GregorianCalendar.SEPTEMBER, 7)
         }
-        val reminderInteractor = ReminderInteractorImpl(reminderRepository, currentDate)
+        val reminderInteractor = ReminderInteractorImpl(
+            reminderRepository,
+            currentDate,
+            dispatchersProvider
+        )
 
-        runBlocking {
-            reminderInteractor.addBirthdayReminder(ivanIvanovich)
-        }
+        reminderInteractor.addBirthdayReminder(ivanIvanovich)
 
         verify(reminderRepository).addBirthdayReminder(
             eq(ivanIvanovich),
@@ -76,30 +83,34 @@ class BirthdayReminderTest {
     }
 
     @Test
-    fun remove_WithReminder() {
+    fun remove_WithReminder() = runBlocking {
         val currentDate = GregorianCalendar().apply {
             set(GregorianCalendar.YEAR, 1999)
         }
-        val reminderInteractor = ReminderInteractorImpl(reminderRepository, currentDate)
+        val reminderInteractor = ReminderInteractorImpl(
+            reminderRepository,
+            currentDate,
+            dispatchersProvider
+        )
 
-        runBlocking {
-            reminderInteractor.addBirthdayReminder(ivanIvanovich)
-            reminderInteractor.removeBirthdayReminder(ivanIvanovich)
-        }
+        reminderInteractor.addBirthdayReminder(ivanIvanovich)
+        reminderInteractor.removeBirthdayReminder(ivanIvanovich)
 
         verify(reminderRepository).removeBirthdayReminder(eq(ivanIvanovich))
     }
 
     @Test
-    fun add_29FebruaryWithoutReminder() {
+    fun add_29FebruaryWithoutReminder() = runBlocking {
         val currentDate = GregorianCalendar().apply {
             set(1999, GregorianCalendar.MARCH, 2)
         }
-        val reminderInteractor = ReminderInteractorImpl(reminderRepository, currentDate)
+        val reminderInteractor = ReminderInteractorImpl(
+            reminderRepository,
+            currentDate,
+            dispatchersProvider
+        )
 
-        runBlocking {
-            reminderInteractor.addBirthdayReminder(pavelPavlovich)
-        }
+        reminderInteractor.addBirthdayReminder(pavelPavlovich)
 
         verify(reminderRepository).addBirthdayReminder(
             eq(pavelPavlovich),
@@ -112,15 +123,17 @@ class BirthdayReminderTest {
     }
 
     @Test
-    fun add_29FebruaryLeapYearWithoutReminder_In4Years() {
+    fun add_29FebruaryLeapYearWithoutReminder_In4Years() = runBlocking {
         val currentDate = GregorianCalendar().apply {
             set(2000, GregorianCalendar.MARCH, 1)
         }
-        val reminderInteractor = ReminderInteractorImpl(reminderRepository, currentDate)
+        val reminderInteractor = ReminderInteractorImpl(
+            reminderRepository,
+            currentDate,
+            dispatchersProvider
+        )
 
-        runBlocking {
-            reminderInteractor.addBirthdayReminder(pavelPavlovich)
-        }
+        reminderInteractor.addBirthdayReminder(pavelPavlovich)
 
         verify(reminderRepository).addBirthdayReminder(
             eq(pavelPavlovich),

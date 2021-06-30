@@ -9,23 +9,15 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.fl0wer.R
-import com.example.fl0wer.androidApp.di.core.ViewModelFactory
-import com.example.fl0wer.androidApp.ui.UiState
 import com.example.fl0wer.androidApp.ui.contactlist.adapter.ContactsAdapter
 import com.example.fl0wer.androidApp.ui.contactlist.adapter.contactItemDecorator
+import com.example.fl0wer.androidApp.ui.core.BaseFragment
 import com.example.fl0wer.databinding.FragmentContactListBinding
-import dagger.android.support.DaggerFragment
-import javax.inject.Inject
-import kotlinx.coroutines.flow.collect
 
-class ContactListFragment : DaggerFragment() {
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
-    private val viewModel: ContactListViewModel by viewModels { viewModelFactory }
+class ContactListFragment : BaseFragment<ContactListViewModel, ContactListState>() {
+    override val vmClass = ContactListViewModel::class.java
     private lateinit var binding: FragmentContactListBinding
     private val contactsAdapter by lazy {
         ContactsAdapter { position ->
@@ -73,11 +65,6 @@ class ContactListFragment : DaggerFragment() {
                 viewModel.contactPinsClicked()
             }
         }
-        lifecycleScope.launchWhenStarted {
-            viewModel.uiState.collect {
-                updateState(it)
-            }
-        }
     }
 
     override fun onResume() {
@@ -91,7 +78,7 @@ class ContactListFragment : DaggerFragment() {
         }
     }
 
-    private fun updateState(state: UiState) {
+    override fun updateState(state: ContactListState) {
         when (state) {
             is ContactListState.Idle -> drawIdleState(state)
             is ContactListState.Loading -> drawLoadingState()

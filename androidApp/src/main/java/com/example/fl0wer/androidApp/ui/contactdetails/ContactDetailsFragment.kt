@@ -12,24 +12,18 @@ import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.fl0wer.R
 import com.example.fl0wer.androidApp.data.contacts.ContactParcelable
-import com.example.fl0wer.androidApp.di.core.ViewModelFactory
-import com.example.fl0wer.androidApp.ui.UiState
+import com.example.fl0wer.androidApp.ui.core.BaseFragment
 import com.example.fl0wer.androidApp.util.Const.BUNDLE_INITIAL_ARGS
 import com.example.fl0wer.databinding.FragmentContactDetailsBinding
 import com.example.fl0wer.databinding.IncludeContactDetailBinding
 import com.example.fl0wer.databinding.IncludeContactDetailMultilineBinding
-import dagger.android.support.DaggerFragment
 import kotlinx.coroutines.flow.collect
-import javax.inject.Inject
 
-class ContactDetailsFragment : DaggerFragment() {
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
-    private val viewModel: ContactDetailsViewModel by viewModels { viewModelFactory }
+class ContactDetailsFragment : BaseFragment<ContactDetailsViewModel, ContactDetailsState>() {
+    override val vmClass = ContactDetailsViewModel::class.java
     private lateinit var binding: FragmentContactDetailsBinding
 
     companion object {
@@ -63,19 +57,13 @@ class ContactDetailsFragment : DaggerFragment() {
             }
         }
         lifecycleScope.launchWhenStarted {
-            viewModel.uiState.collect {
+            viewModel.uiState().collect {
                 updateState(it)
             }
         }
     }
 
-    fun initialArguments(): ContactDetailsScreenParams {
-        arguments?.getParcelable<ContactDetailsScreenParams>(BUNDLE_INITIAL_ARGS)
-            ?.also { return it }
-        throw IllegalArgumentException("Fragment doesn't contain initial args")
-    }
-
-    private fun updateState(state: UiState) {
+    override fun updateState(state: ContactDetailsState) {
         when (state) {
             is ContactDetailsState.Idle -> drawIdleState(state)
             is ContactDetailsState.Loading -> drawLoadingState()

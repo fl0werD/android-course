@@ -1,9 +1,10 @@
 package com.example.fl0wer.androidApp.domain.locations
 
 import com.example.fl0wer.androidApp.domain.core.Result
-import com.example.fl0wer.androidApp.domain.core.dispatchers.DispatchersProvider
+import com.example.fl0wer.androidApp.ui.core.dispatchers.DispatchersProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class LocationInteractorImpl(
     private val locationRepository: LocationRepository,
@@ -33,14 +34,9 @@ class LocationInteractorImpl(
                     }
                 }
             } catch (e: Exception) {
-                // throw e
+                Timber.e(e)
             }
         }
-
-    /*override suspend fun location(contactId: Int) =
-        withContext(dispatchersProvider.io) {
-            locationRepository.location(contactId)
-        }*/
 
     override suspend fun locations() =
         withContext(dispatchersProvider.io) {

@@ -4,12 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.example.fl0wer.R
 import com.example.fl0wer.androidApp.data.locations.LocationParcelable
-import com.example.fl0wer.androidApp.di.core.ViewModelFactory
-import com.example.fl0wer.androidApp.ui.UiState
+import com.example.fl0wer.androidApp.ui.core.BaseFragment
 import com.example.fl0wer.databinding.FragmentContactLocationsBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -17,16 +15,12 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.ktx.addMarker
-import dagger.android.support.DaggerFragment
 import kotlinx.coroutines.flow.collect
-import javax.inject.Inject
 
 private const val CAMERA_BOUNDS_PADDING = 100
 
-class ContactLocationsFragment : DaggerFragment() {
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
-    private val viewModel: ContactLocationsViewModel by viewModels { viewModelFactory }
+class ContactLocationsFragment : BaseFragment<ContactLocationsViewModel, ContactLocationsState>() {
+    override val vmClass = ContactLocationsViewModel::class.java
     private lateinit var binding: FragmentContactLocationsBinding
     private var mapFragment: SupportMapFragment? = null
 
@@ -51,13 +45,13 @@ class ContactLocationsFragment : DaggerFragment() {
         }
         mapFragment = childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
         lifecycleScope.launchWhenStarted {
-            viewModel.uiState.collect {
+            viewModel.uiState().collect {
                 updateState(it)
             }
         }
     }
 
-    private fun updateState(state: UiState) {
+    override fun updateState(state: ContactLocationsState) {
         when (state) {
             is ContactLocationsState.Loading -> drawLoadingState()
             is ContactLocationsState.Idle -> drawIdleState(state)

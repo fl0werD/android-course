@@ -70,18 +70,18 @@ val contactDiffCallback = object : DiffUtil.ItemCallback<ContactListItem>() {
     override fun areItemsTheSame(oldItem: ContactListItem, newItem: ContactListItem): Boolean {
         return when {
             oldItem is ContactListItem.Contact && newItem is ContactListItem.Contact -> {
-                return oldItem.contact.id == newItem.contact.id
+                oldItem.contact.id == newItem.contact.id
             }
-            else -> false
+            else -> oldItem == newItem
         }
     }
 
     override fun areContentsTheSame(oldItem: ContactListItem, newItem: ContactListItem): Boolean {
         return when {
             oldItem is ContactListItem.Contact && newItem is ContactListItem.Contact -> {
-                return oldItem.contact.name == newItem.contact.name
+                oldItem.contact.name == newItem.contact.name
             }
-            else -> false
+            else -> oldItem == newItem
         }
     }
 }

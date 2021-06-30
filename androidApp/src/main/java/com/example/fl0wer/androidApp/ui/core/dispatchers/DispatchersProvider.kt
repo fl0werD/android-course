@@ -1,4 +1,4 @@
-package com.example.fl0wer.androidApp.domain.core.dispatchers
+package com.example.fl0wer.androidApp.ui.core.dispatchers
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.MainCoroutineDispatcher

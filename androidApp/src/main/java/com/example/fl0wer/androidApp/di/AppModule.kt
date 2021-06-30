@@ -1,8 +1,8 @@
 package com.example.fl0wer.androidApp.di
 
 import com.example.fl0wer.androidApp.data.contacts.receiver.AppScope
-import com.example.fl0wer.androidApp.domain.core.dispatchers.DispatchersProvider
-import com.example.fl0wer.androidApp.domain.core.dispatchers.DispatchersProviderImpl
+import com.example.fl0wer.androidApp.ui.core.dispatchers.DispatchersProvider
+import com.example.fl0wer.androidApp.ui.core.dispatchers.DispatchersProviderImpl
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
