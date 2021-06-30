@@ -76,10 +76,10 @@ class ContactsRepositoryImpl(
         val id = data.getInt(ContactsContract.Contacts._ID) ?: return null
         val lookupKey = data.getString(ContactsContract.Data.LOOKUP_KEY) ?: return null
         val name = data.getString(ContactsContract.Data.DISPLAY_NAME_PRIMARY) ?: return null
-        val phones = getPhones(lookupKey)
-        val emails = getEmails(lookupKey)
-        val birthday = getBirthday(lookupKey)
-        val note = getNote(lookupKey)
+        val phones = getPhones(id)
+        val emails = getEmails(id)
+        val birthday = getBirthday(id)
+        val note = getNote(id)
 
         return Contact(
             id,
@@ -93,7 +93,7 @@ class ContactsRepositoryImpl(
         )
     }
 
-    private fun getPhones(lookupKey: String): MutableList<String> {
+    private fun getPhones(id: Int): MutableList<String> {
         val phones = mutableListOf("", "")
         context.contentResolver.query(
             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
@@ -101,8 +101,8 @@ class ContactsRepositoryImpl(
                 ContactsContract.CommonDataKinds.Phone.TYPE,
                 ContactsContract.CommonDataKinds.Phone.NUMBER,
             ),
-            ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY + " = ?",
-            arrayOf(lookupKey),
+            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+            arrayOf(id.toString()),
             null,
         )?.use {
             while (it.moveToNext()) {
@@ -116,16 +116,16 @@ class ContactsRepositoryImpl(
         return phones
     }
 
-    private fun getEmails(lookupKey: String): MutableList<String> {
+    private fun getEmails(id: Int): MutableList<String> {
         val emails = mutableListOf("", "")
         context.contentResolver.query(
-            ContactsContract.CommonDataKinds.Email.CONTENT_LOOKUP_URI,
+            ContactsContract.CommonDataKinds.Email.CONTENT_URI,
             arrayOf(
                 ContactsContract.CommonDataKinds.Email.TYPE,
                 ContactsContract.CommonDataKinds.Email.LABEL,
             ),
-            ContactsContract.CommonDataKinds.Email.LOOKUP_KEY + " = ?",
-            arrayOf(lookupKey),
+            ContactsContract.CommonDataKinds.Email.CONTACT_ID + " = ?",
+            arrayOf(id.toString()),
             null,
         )?.use {
             while (it.moveToNext()) {
@@ -140,17 +140,17 @@ class ContactsRepositoryImpl(
     }
 
     @Suppress("NestedBlockDepth")
-    private fun getBirthday(lookupKey: String): MutableList<Int> {
+    private fun getBirthday(id: Int): MutableList<Int> {
         val birthday = mutableListOf(-1, -1)
         context.contentResolver.query(
             ContactsContract.Data.CONTENT_URI,
             arrayOf(ContactsContract.CommonDataKinds.Event.START_DATE),
-            ContactsContract.CommonDataKinds.Event.LOOKUP_KEY + "= ? AND " +
+            ContactsContract.CommonDataKinds.Event.CONTACT_ID + "= ? AND " +
                 ContactsContract.Data.MIMETYPE + "= ? AND " +
                 ContactsContract.CommonDataKinds.Event.TYPE + "=" +
                 ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY,
             arrayOf(
-                lookupKey,
+                id.toString(),
                 ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE,
             ),
             null,
@@ -175,15 +175,15 @@ class ContactsRepositoryImpl(
         return birthday
     }
 
-    private fun getNote(lookupKey: String): String {
+    private fun getNote(id: Int): String {
         var note = ""
         context.contentResolver.query(
             ContactsContract.Data.CONTENT_URI,
             arrayOf(ContactsContract.CommonDataKinds.Note.NOTE),
-            ContactsContract.Data.LOOKUP_KEY + "= ? AND " +
+            ContactsContract.Data.CONTACT_ID + "= ? AND " +
                 ContactsContract.Data.MIMETYPE + "= ?",
             arrayOf(
-                lookupKey,
+                id.toString(),
                 ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE,
             ),
             null,
