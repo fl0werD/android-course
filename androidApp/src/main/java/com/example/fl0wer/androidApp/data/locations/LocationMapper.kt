@@ -1,7 +1,7 @@
 package com.example.fl0wer.androidApp.data.locations
 
 import com.example.fl0wer.androidApp.data.locations.database.LocationEntity
-import com.example.fl0wer.domain.locations.Location
+import com.example.fl0wer.androidApp.domain.locations.Location
 
 object LocationMapper {
     fun Location.toParcelable() = LocationParcelable(

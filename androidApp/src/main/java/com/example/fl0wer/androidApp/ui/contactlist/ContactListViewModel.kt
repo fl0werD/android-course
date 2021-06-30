@@ -6,8 +6,8 @@ import com.example.fl0wer.androidApp.data.contacts.ContactMapper.toParcelable
 import com.example.fl0wer.androidApp.ui.contactlist.adapter.ContactListItem
 import com.example.fl0wer.androidApp.ui.core.navigation.Screens
 import com.example.fl0wer.androidApp.ui.nullOr
-import com.example.fl0wer.domain.contacts.Contact
-import com.example.fl0wer.domain.contacts.ContactsInteractor
+import com.example.fl0wer.androidApp.domain.contacts.Contact
+import com.example.fl0wer.androidApp.domain.contacts.ContactsInteractor
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.forward
 import kotlinx.coroutines.CoroutineExceptionHandler

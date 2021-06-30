@@ -4,10 +4,10 @@ import com.example.fl0wer.androidApp.data.core.network.GoogleApi
 import com.example.fl0wer.androidApp.data.locations.LocationMapper.toEntity
 import com.example.fl0wer.androidApp.data.locations.LocationMapper.toLocation
 import com.example.fl0wer.androidApp.data.locations.database.LocationDao
-import com.example.fl0wer.domain.core.Result
-import com.example.fl0wer.domain.core.dispatchers.DispatchersProvider
-import com.example.fl0wer.domain.locations.Location
-import com.example.fl0wer.domain.locations.LocationRepository
+import com.example.fl0wer.androidApp.domain.core.Result
+import com.example.fl0wer.androidApp.domain.core.dispatchers.DispatchersProvider
+import com.example.fl0wer.androidApp.domain.locations.Location
+import com.example.fl0wer.androidApp.domain.locations.LocationRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext

@@ -1,6 +1,6 @@
 package com.example.fl0wer.androidApp.data.contacts
 
-import com.example.fl0wer.domain.contacts.Contact
+import com.example.fl0wer.androidApp.domain.contacts.Contact
 
 object ContactMapper {
     fun Contact.toParcelable() = ContactParcelable(

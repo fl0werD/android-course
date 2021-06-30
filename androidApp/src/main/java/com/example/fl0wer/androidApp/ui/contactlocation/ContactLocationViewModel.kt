@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fl0wer.androidApp.data.locations.LocationMapper.toParcelable
 import com.example.fl0wer.androidApp.ui.nullOr
-import com.example.fl0wer.domain.core.dispatchers.DispatchersProvider
-import com.example.fl0wer.domain.locations.LocationInteractor
+import com.example.fl0wer.androidApp.domain.core.dispatchers.DispatchersProvider
+import com.example.fl0wer.androidApp.domain.locations.LocationInteractor
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.back
 import com.google.android.gms.maps.model.LatLng

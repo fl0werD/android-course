@@ -3,7 +3,7 @@ package com.example.fl0wer.androidApp.ui.contactlocations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fl0wer.androidApp.data.locations.LocationMapper.toParcelable
-import com.example.fl0wer.domain.locations.LocationInteractor
+import com.example.fl0wer.androidApp.domain.locations.LocationInteractor
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.back
 import kotlinx.coroutines.CancellationException

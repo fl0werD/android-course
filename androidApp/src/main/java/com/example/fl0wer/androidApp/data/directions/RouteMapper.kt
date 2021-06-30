@@ -4,9 +4,9 @@ import com.example.fl0wer.androidApp.data.directions.LatLonMapper.toLatLon
 import com.example.fl0wer.androidApp.data.directions.LatLonMapper.toParcelable
 import com.example.fl0wer.androidApp.data.directions.network.BoundsDto
 import com.example.fl0wer.androidApp.data.directions.network.LatLonDto
-import com.example.fl0wer.domain.directions.Bounds
-import com.example.fl0wer.domain.directions.Route
-import com.example.fl0wer.domain.locations.LatLon
+import com.example.fl0wer.androidApp.domain.directions.Bounds
+import com.example.fl0wer.androidApp.domain.directions.Route
+import com.example.fl0wer.androidApp.domain.locations.LatLon
 
 fun BoundsDto.toBound() = Bounds(
     northeast = northeast.toLatLon(),

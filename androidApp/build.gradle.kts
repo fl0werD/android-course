@@ -44,8 +44,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":domain"))
-
     val daggerVersion = properties["dagger_version"]
     val coreVersion = "1.3.2"
     val appcompatVersion = "1.3.0"
@@ -96,6 +94,7 @@ dependencies {
     implementation("com.github.terrakok:modo-render-android-fm:$modoVersion")
 
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
     androidTestImplementation("androidx.test:runner:1.3.0")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
 }

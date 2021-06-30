@@ -5,11 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.fl0wer.androidApp.data.contacts.ContactMapper.toParcelable
 import com.example.fl0wer.androidApp.data.directions.toParcelable
 import com.example.fl0wer.androidApp.ui.contactlist.adapter.ContactListItem
-import com.example.fl0wer.domain.contacts.Contact
-import com.example.fl0wer.domain.contacts.ContactsInteractor
-import com.example.fl0wer.domain.core.Result
-import com.example.fl0wer.domain.directions.DirectionInteractor
-import com.example.fl0wer.domain.locations.LocationInteractor
+import com.example.fl0wer.androidApp.domain.contacts.Contact
+import com.example.fl0wer.androidApp.domain.contacts.ContactsInteractor
+import com.example.fl0wer.androidApp.domain.core.Result
+import com.example.fl0wer.androidApp.domain.directions.DirectionInteractor
+import com.example.fl0wer.androidApp.domain.locations.LocationInteractor
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.back
 import kotlinx.coroutines.CancellationException

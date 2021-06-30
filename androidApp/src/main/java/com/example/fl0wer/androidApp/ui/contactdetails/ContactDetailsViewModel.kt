@@ -8,10 +8,10 @@ import com.example.fl0wer.androidApp.data.contacts.ContactParcelable
 import com.example.fl0wer.androidApp.data.locations.LocationMapper.toParcelable
 import com.example.fl0wer.androidApp.ui.core.navigation.Screens
 import com.example.fl0wer.androidApp.ui.nullOr
-import com.example.fl0wer.domain.contacts.ContactsInteractor
-import com.example.fl0wer.domain.contacts.ReminderInteractor
-import com.example.fl0wer.domain.core.dispatchers.DispatchersProvider
-import com.example.fl0wer.domain.locations.LocationInteractor
+import com.example.fl0wer.androidApp.domain.contacts.ContactsInteractor
+import com.example.fl0wer.androidApp.domain.contacts.ReminderInteractor
+import com.example.fl0wer.androidApp.domain.core.dispatchers.DispatchersProvider
+import com.example.fl0wer.androidApp.domain.locations.LocationInteractor
 import com.github.terrakok.modo.Modo
 import com.github.terrakok.modo.back
 import com.github.terrakok.modo.forward

@@ -1,5 +1,2 @@
 rootProject.name = "fl0wer"
-include(
-        ":domain",
-        ':androidApp',
-)
+include(':androidApp')

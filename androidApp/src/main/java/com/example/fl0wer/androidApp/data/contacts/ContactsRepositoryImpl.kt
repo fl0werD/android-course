@@ -4,9 +4,9 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
-import com.example.fl0wer.domain.contacts.Contact
-import com.example.fl0wer.domain.contacts.ContactsRepository
-import com.example.fl0wer.domain.core.dispatchers.DispatchersProvider
+import com.example.fl0wer.androidApp.domain.contacts.Contact
+import com.example.fl0wer.androidApp.domain.contacts.ContactsRepository
+import com.example.fl0wer.androidApp.domain.core.dispatchers.DispatchersProvider
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.GregorianCalendar

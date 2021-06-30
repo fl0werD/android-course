@@ -1,10 +1,10 @@
 package com.example.fl0wer.androidApp.data.directions
 
 import com.example.fl0wer.androidApp.data.core.network.GoogleApi
-import com.example.fl0wer.domain.core.Result
-import com.example.fl0wer.domain.directions.DirectionRepository
-import com.example.fl0wer.domain.directions.Route
-import com.example.fl0wer.domain.locations.LatLon
+import com.example.fl0wer.androidApp.domain.core.Result
+import com.example.fl0wer.androidApp.domain.directions.DirectionRepository
+import com.example.fl0wer.androidApp.domain.directions.Route
+import com.example.fl0wer.androidApp.domain.locations.LatLon
 import com.google.maps.android.PolyUtil
 import java.io.IOException
 
