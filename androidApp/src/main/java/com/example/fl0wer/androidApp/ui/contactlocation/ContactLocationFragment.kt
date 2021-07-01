@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import com.example.fl0wer.R
 import com.example.fl0wer.androidApp.ui.core.BaseFragment
@@ -44,10 +45,12 @@ class ContactLocationFragment : BaseFragment<ContactLocationViewModel, ContactLo
                 viewModel.backPressed()
             }
         }
-        mapFragment = childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
-        mapFragment?.getMapAsync {
-            it.setOnMapLongClickListener { location ->
-                viewModel.mapLongClicked(location)
+        mapFragment = (childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment)?.apply {
+            getMapAsync {
+                it.uiSettings.isCompassEnabled = false
+                it.setOnMapLongClickListener { location ->
+                    viewModel.mapLongClicked(location)
+                }
             }
         }
     }
@@ -66,6 +69,9 @@ class ContactLocationFragment : BaseFragment<ContactLocationViewModel, ContactLo
     private fun drawIdleState(state: ContactLocationState.Idle) = with(binding) {
         toolbar.title = getString(R.string.contact_location)
         state.location?.apply {
+            if (!state.firstEntryZoom) {
+                Toast.makeText(requireContext(), address, Toast.LENGTH_LONG).show()
+            }
             mapFragment?.getMapAsync {
                 val location = LatLng(latitude, longitude)
                 mapMarker?.remove()

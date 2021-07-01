@@ -9,10 +9,17 @@ import android.content.Context
 import android.content.Context.NOTIFICATION_SERVICE
 import android.os.Build
 import androidx.core.app.NotificationManagerCompat
-import com.example.fl0wer.androidApp.util.Const.NOTIFICATION_CHANNEL_ID
 import com.example.fl0wer.R
 import com.example.fl0wer.androidApp.data.directions.LatLonParcelable
+import com.example.fl0wer.androidApp.data.directions.network.DirectionsResponse
+import com.example.fl0wer.androidApp.data.locations.network.GeocodeResponse
+import com.example.fl0wer.androidApp.util.Const.NOTIFICATION_CHANNEL_ID
+import com.example.fl0wer.androidApp.util.Const.RESPONSE_SUCCESS_STATUS
 import com.google.android.gms.maps.model.LatLng
+
+fun DirectionsResponse.isSuccess() = (status == RESPONSE_SUCCESS_STATUS)
+
+fun GeocodeResponse.isSuccess() = (status == RESPONSE_SUCCESS_STATUS)
 
 fun LatLonParcelable.toLatLng() = LatLng(latitude, longitude)
 

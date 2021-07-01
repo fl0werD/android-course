@@ -24,7 +24,11 @@ class ContactLocationsViewModel @Inject constructor(
         vmScope.launch {
             try {
                 val locations = locationInteractor.locations()
-                updateState { ContactLocationsState.Idle(locations.toParcelable()) }
+                updateState(
+                    ContactLocationsState.Idle(
+                        locations.toParcelable(),
+                    )
+                )
             } catch (e: IOException) {
                 Timber.e(e)
             }

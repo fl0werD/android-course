@@ -40,68 +40,68 @@ class ContactsRouteViewModel @Inject constructor(
 
     private fun loadContacts() {
         vmScope.launch {
-            updateState { uiState.copy(loading = true) }
+            updateState(uiState.copy(loading = true))
             try {
                 val contacts = contactsInteractor.contactsWithAddress(screenParams.startContactId)
-                updateState {
+                updateState(
                     uiState.copy(
                         loading = false,
                         contacts = contacts.toListItems(),
                         error = null,
                     )
-                }
+                )
             } catch (e: IOException) {
                 Timber.e(e)
-                updateState {
+                updateState(
                     uiState.copy(
                         loading = false,
                         error = e,
                     )
-                }
+                )
             }
         }
     }
 
     private fun buildRoute(startContactId: Int, endContactId: Int) {
         vmScope.launch {
-            updateState {
+            updateState(
                 uiState.copy(
                     loading = true,
                     error = null,
                 )
-            }
+            )
             try {
                 val start = locationInteractor.observeLocation(startContactId).first()
                 val end = locationInteractor.observeLocation(endContactId).first()
                 if (start != null && end != null) {
                     when (val route = directionInteractor.route(start.address, end.address)) {
                         is Result.Success -> {
-                            updateState {
+                            updateState(
                                 uiState.copy(
                                     loading = false,
                                     route = route.value.toParcelable(),
                                     error = null,
                                 )
-                            }
+                            )
                         }
                         is Result.Failure -> {
-                            updateState {
+                            updateState(
                                 uiState.copy(
                                     loading = false,
                                     error = route.throwable,
                                 )
-                            }
+                            )
                         }
                     }
                 }
             } catch (e: IOException) {
                 Timber.e(e)
-                updateState {
+                updateState(
                     uiState.copy(
                         loading = false,
                         error = null,
                     )
-                }
+                )
             }
         }
     }

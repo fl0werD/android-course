@@ -44,18 +44,18 @@ class ContactLocationViewModel @Inject constructor(
                 if (currentState is ContactLocationState.Idle) {
                     currentState.copy(
                         firstEntryZoom = false,
-                        location = it?.toParcelable()
+                        location = it?.toParcelable(),
                     )
                 } else {
                     ContactLocationState.Idle(
                         firstEntryZoom = true,
-                        location = it?.toParcelable()
+                        location = it?.toParcelable(),
                     )
                 }
             }
             .flowOn(dispatchersProvider.io)
             .collect { newState ->
-                updateState { newState }
+                updateState(newState)
             }
     }
 }

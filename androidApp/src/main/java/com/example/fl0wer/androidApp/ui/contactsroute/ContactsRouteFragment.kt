@@ -60,7 +60,11 @@ class ContactsRouteFragment : BaseFragment<ContactsRouteViewModel, ContactsRoute
             layoutManager = LinearLayoutManager(context).apply { recycleChildrenOnDetach = true }
             adapter = contactsAdapter
         }
-        mapFragment = childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
+        mapFragment = (childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment)?.apply {
+            getMapAsync {
+                it.uiSettings.isCompassEnabled = false
+            }
+        }
     }
 
     override fun updateState(state: ContactsRouteState) {

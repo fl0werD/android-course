@@ -8,4 +8,6 @@ object Const {
     const val NOTICE_BIRTHDAY_EXTRA_CONTACT_ID = "EXTRA_CONTACT_ID"
 
     const val BUNDLE_INITIAL_ARGS = "INITIAL_ARGS"
+
+    const val RESPONSE_SUCCESS_STATUS = "OK"
 }

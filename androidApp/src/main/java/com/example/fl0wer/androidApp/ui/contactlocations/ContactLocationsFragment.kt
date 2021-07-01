@@ -43,7 +43,11 @@ class ContactLocationsFragment : BaseFragment<ContactLocationsViewModel, Contact
                 viewModel.backPressed()
             }
         }
-        mapFragment = childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
+        mapFragment = (childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment)?.apply {
+            getMapAsync {
+                it.uiSettings.isCompassEnabled = false
+            }
+        }
         lifecycleScope.launchWhenStarted {
             viewModel.uiState().collect {
                 updateState(it)

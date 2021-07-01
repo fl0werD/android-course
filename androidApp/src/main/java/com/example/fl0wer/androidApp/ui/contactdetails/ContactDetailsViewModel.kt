@@ -42,14 +42,14 @@ class ContactDetailsViewModel @Inject constructor(
             try {
                 val contact = currentState.contact.toContact()
                 reminderInteractor.changeBirthdayReminder(contact)
-                updateState {
+                updateState(
                     currentState.copy(
                         birthdayReminder = reminderInteractor.birthdayReminder(contact)
                     )
-                }
+                )
             } catch (e: IOException) {
                 Timber.e(e)
-                updateState { ContactDetailsState.Failure }
+                updateState(ContactDetailsState.Failure)
             }
         }
     }
@@ -66,24 +66,24 @@ class ContactDetailsViewModel @Inject constructor(
 
     private fun loadContact(lookupKey: String) {
         vmScope.launch {
-            updateState { ContactDetailsState.Loading }
+            updateState(ContactDetailsState.Loading)
             try {
                 val result = contactsInteractor.contact(lookupKey)
                 if (result != null) {
                     val contact = result.toParcelable()
-                    updateState {
+                    updateState(
                         ContactDetailsState.Idle(
                             contact,
                             reminderInteractor.birthdayReminder(result)
                         )
-                    }
+                    )
                     subscribeLocation(contact)
                 } else {
-                    updateState { ContactDetailsState.Failure }
+                    updateState(ContactDetailsState.Failure)
                 }
             } catch (e: IOException) {
                 Timber.e(e)
-                updateState { ContactDetailsState.Failure }
+                updateState(ContactDetailsState.Failure)
             }
         }
     }
@@ -105,7 +105,7 @@ class ContactDetailsViewModel @Inject constructor(
                 if (newState == null) {
                     return@collect
                 }
-                updateState { newState }
+                updateState(newState)
             }
     }
 }

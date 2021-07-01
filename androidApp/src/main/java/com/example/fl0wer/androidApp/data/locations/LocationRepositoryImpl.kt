@@ -8,6 +8,7 @@ import com.example.fl0wer.androidApp.domain.core.Result
 import com.example.fl0wer.androidApp.ui.core.dispatchers.DispatchersProvider
 import com.example.fl0wer.androidApp.domain.locations.Location
 import com.example.fl0wer.androidApp.domain.locations.LocationRepository
+import com.example.fl0wer.androidApp.util.isSuccess
 import java.io.IOException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -37,7 +38,7 @@ class LocationRepositoryImpl(
     override suspend fun reverseGeocode(latitude: Double, longitude: Double) =
         withContext(dispatchersProvider.io) {
             val response = googleApi.reverseGeocode("$latitude,$longitude")
-            if (response.status == "OK") {
+            if (response.isSuccess()) {
                 Result.Success(response.results[0].address)
             } else {
                 Result.Failure(IOException("Status not OK"))

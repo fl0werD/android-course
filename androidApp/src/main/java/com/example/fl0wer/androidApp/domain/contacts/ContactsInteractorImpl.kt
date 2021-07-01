@@ -32,17 +32,15 @@ class ContactsInteractorImpl(
 
     override suspend fun contactsWithAddress(ignoreContactId: Int) =
         withContext(dispatchersProvider.default) {
-            val withAddressList = mutableListOf<Contact>()
-            contactsRepository.contacts().forEach { contact ->
-                locationRepository.locations().forEach { location ->
-                    if (contact.id == location.id &&
-                        contact.id != ignoreContactId &&
-                        location.address.isNotEmpty()
-                    ) {
-                        withAddressList.add(contact)
+            val locations = locationRepository.locations()
+            return@withContext contactsRepository.contacts()
+                .filterNot { it.id == ignoreContactId }
+                .mapNotNull { contact ->
+                    if (locations.firstOrNull { it.id == contact.id } != null) {
+                        contact
+                    } else {
+                        null
                     }
                 }
-            }
-            withAddressList
         }
 }

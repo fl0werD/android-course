@@ -2,10 +2,11 @@ package com.example.fl0wer.androidApp.data.directions
 
 import com.example.fl0wer.androidApp.data.core.network.GoogleApi
 import com.example.fl0wer.androidApp.domain.core.Result
-import com.example.fl0wer.androidApp.ui.core.dispatchers.DispatchersProvider
 import com.example.fl0wer.androidApp.domain.directions.DirectionRepository
 import com.example.fl0wer.androidApp.domain.directions.Route
 import com.example.fl0wer.androidApp.domain.locations.LatLon
+import com.example.fl0wer.androidApp.ui.core.dispatchers.DispatchersProvider
+import com.example.fl0wer.androidApp.util.isSuccess
 import com.google.maps.android.PolyUtil
 import java.io.IOException
 import kotlinx.coroutines.withContext
@@ -20,7 +21,7 @@ class DirectionRepositoryImpl(
         destination: String,
     ) = withContext(dispatchersProvider.io) {
         val response = googleApi.getRoute(origin, destination)
-        if (response.status != "OK") {
+        if (!response.isSuccess()) {
             return@withContext Result.Failure(IOException("Status not OK"))
         }
         val route = response.routes.firstOrNull()

@@ -44,26 +44,34 @@ class ContactListViewModel @Inject constructor(
 
     fun loadContacts(reload: Boolean = false) {
         vmScope.launch {
-            updateState { ContactListState.Loading }
+            updateState(ContactListState.Loading)
             try {
                 val contacts = contactsInteractor.contacts(reload)
-                updateState { ContactListState.Idle(contacts.toListItems()) }
+                updateState(
+                    ContactListState.Idle(
+                        contacts.toListItems(),
+                    )
+                )
             } catch (e: IOException) {
                 Timber.e(e)
-                updateState { ContactListState.Failure }
+                updateState(ContactListState.Failure)
             }
         }
     }
 
     private fun searchContacts(nameFilter: String) {
         vmScope.launch {
-            updateState { ContactListState.Loading }
+            updateState(ContactListState.Loading)
             try {
                 val contacts = contactsInteractor.search(nameFilter)
-                updateState { ContactListState.Idle(contacts.toListItems()) }
+                updateState(
+                    ContactListState.Idle(
+                        contacts.toListItems(),
+                    )
+                )
             } catch (e: IOException) {
                 Timber.e(e)
-                updateState { ContactListState.Failure }
+                updateState(ContactListState.Failure)
             }
         }
     }

@@ -25,8 +25,8 @@ abstract class BaseViewModel<S : UiState>(
         Timber.e(e)
     }
 
-    protected suspend fun updateState(newState: suspend () -> S) {
-        _uiState.value = newState()
+    protected fun updateState(newState: S) {
+        _uiState.value = newState
     }
 
     open fun backPressed() {
